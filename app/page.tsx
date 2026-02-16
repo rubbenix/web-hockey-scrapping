@@ -1,65 +1,84 @@
-import Image from "next/image";
 
-export default function Home() {
+import React from "react";
+
+const CLUB_ID = "253"; // Cambia este valor para filtrar por club
+const CATEGORIA = "BENJAMÍ OR COPA BCN 2"; // Cambia este valor para filtrar por categoría
+
+type Partido = {
+  categoria: string;
+  fecha: string;
+  hora: string;
+  equipo_local: string;
+  equipo_visitante: string;
+  pista: string;
+  club1: string;
+  club2: string;
+};
+
+function parseFechaHora(fecha: string, hora: string) {
+  // fecha: dd/mm/yyyy, hora: hh:mm
+  const [d, m, y] = fecha.split("/").map(Number);
+  const [h, min] = hora.split(":").map(Number);
+  return new Date(y, m - 1, d, h, min);
+}
+
+async function getPartidos(): Promise<Partido[]> {
+  const res = await fetch("/api/agenda", { cache: "no-store" });
+  if (!res.ok) throw new Error("Error al cargar la agenda");
+  const data = await res.json();
+  return data.partidos as Partido[];
+}
+
+export default async function Home() {
+  let partidos: Partido[] = [];
+  let error = null;
+  try {
+    partidos = await getPartidos();
+  } catch (e: any) {
+    error = e.message || "Error desconocido";
+  }
+
+  const now = new Date();
+  const filtered = partidos
+    .filter(
+      (p) =>
+        (p.club1 === CLUB_ID || p.club2 === CLUB_ID) &&
+        p.categoria === CATEGORIA &&
+        parseFechaHora(p.fecha, p.hora) > now
+    )
+    .sort((a, b) =>
+      parseFechaHora(a.fecha, a.hora).getTime() -
+      parseFechaHora(b.fecha, b.hora).getTime()
+    );
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="min-h-screen bg-zinc-100 flex flex-col items-center py-8">
+      <h1 className="text-2xl font-bold mb-6 text-zinc-800">Agenda Hockey Patines</h1>
+      {error ? (
+        <div className="text-red-600 bg-white p-4 rounded shadow mb-4">{error}</div>
+      ) : partidos.length === 0 ? (
+        <div className="text-zinc-500">Cargando partidos...</div>
+      ) : filtered.length === 0 ? (
+        <div className="text-zinc-500">No hay partidos próximos para el club y categoría seleccionados.</div>
+      ) : (
+        <div className="w-full max-w-2xl flex flex-col gap-4">
+          {filtered.map((p, i) => (
+            <div
+              key={i}
+              className="bg-white rounded-xl shadow p-5 flex flex-col gap-2 border border-zinc-100"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              <div className="text-xs text-zinc-500 mb-1">
+                {p.fecha} {p.hora}
+              </div>
+              <div className="text-lg font-semibold text-zinc-800">
+                {p.equipo_local} <span className="text-zinc-400">vs</span> {p.equipo_visitante}
+              </div>
+              <div className="text-sm text-zinc-600">Pista: {p.pista}</div>
+            </div>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      )}
+      <footer className="mt-10 text-xs text-zinc-400">Datos: FECAPA</footer>
     </div>
   );
 }
