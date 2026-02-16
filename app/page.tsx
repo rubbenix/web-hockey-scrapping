@@ -17,8 +17,8 @@ type Partido = {
   equipo_visitante: string;
   resultado: string | null;
   pista: string;
-  club1: string | undefined;
-  club2: string | undefined;
+  club1?: string;
+  club2?: string;
 };
 
 function parseFechaHora(fecha: string, hora: string) {
@@ -46,19 +46,19 @@ async function getPartidos(): Promise<Partido[]> {
 
   $(".fila_agenda").each((_, el) => {
     const tds = $(el).find("td");
-    if (tds.length === 0) return;
+    if (tds.length < 9) return;
 
-    const resultadoRaw = $(tds[5]).text().trim();
+    const resultadoRaw = $(tds[7]).text().trim();
     const tieneResultado = resultadoRaw.includes("-");
 
     partidos.push({
       categoria: $(tds[0]).text().trim(),
       fecha: $(tds[1]).text().trim(),
       hora: $(tds[2]).text().trim(),
-      equipo_local: $(tds[3]).text().trim(),
-      equipo_visitante: $(tds[4]).text().trim(),
+      equipo_local: $(tds[4]).text().trim(),
+      equipo_visitante: $(tds[6]).text().trim(),
       resultado: tieneResultado ? resultadoRaw : null,
-      pista: $(tds[tds.length - 1]).text().trim(),
+      pista: $(tds[8]).text().trim(),
       club1: $(el).attr("club1") || undefined,
       club2: $(el).attr("club2") || undefined,
     });
@@ -99,7 +99,6 @@ export default async function Home() {
         Agenda & Resultados
       </h1>
 
-      {/* Próximos */}
       <section className="w-full max-w-2xl mb-12">
         <h2 className="text-xl font-semibold mb-4 text-zinc-700">
           Próximos partidos
@@ -108,15 +107,10 @@ export default async function Home() {
         {proximos.length === 0 ? (
           <div className="text-zinc-500">No hay próximos partidos.</div>
         ) : (
-          <div className="flex flex-col gap-4">
-            {proximos.map((p, i) => (
-              <Card key={i} partido={p} />
-            ))}
-          </div>
+          proximos.map((p, i) => <Card key={i} partido={p} />)
         )}
       </section>
 
-      {/* Histórico completo */}
       <section className="w-full max-w-2xl">
         <h2 className="text-xl font-semibold mb-4 text-zinc-700">
           Partidos jugados
@@ -125,11 +119,7 @@ export default async function Home() {
         {jugados.length === 0 ? (
           <div className="text-zinc-500">No hay partidos jugados.</div>
         ) : (
-          <div className="flex flex-col gap-4">
-            {jugados.map((p, i) => (
-              <Card key={i} partido={p} />
-            ))}
-          </div>
+          jugados.map((p, i) => <Card key={i} partido={p} />)
         )}
       </section>
     </div>
@@ -138,7 +128,7 @@ export default async function Home() {
 
 function Card({ partido }: { partido: Partido }) {
   return (
-    <div className="bg-white rounded-xl shadow p-5 border border-zinc-100">
+    <div className="bg-white rounded-xl shadow p-5 border border-zinc-100 mb-4">
       <div className="text-xs text-zinc-500 mb-1">
         {partido.fecha} {partido.hora}
       </div>
@@ -156,7 +146,7 @@ function Card({ partido }: { partido: Partido }) {
       </div>
 
       <div className="text-sm text-zinc-600 mt-1">
-        Pista: {partido.pista}
+        {partido.pista}
       </div>
     </div>
   );
