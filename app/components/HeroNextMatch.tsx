@@ -50,8 +50,9 @@ export function HeroNextMatch({ partido }: { partido?: Partido }) {
 
         {partido ? (
           <>
-            <div className="flex flex-col md:flex-row items-center justify-center gap-5 sm:gap-8 md:gap-16 mb-4 sm:mb-6">
-              <div className="flex flex-col items-center gap-4 min-w-0">
+
+            <div className="grid grid-cols-3 items-center justify-center mb-2 sm:mb-4">
+              <div className="flex flex-col items-center gap-2 min-w-0">
                 <div className="size-16 sm:size-20 md:size-24 bg-slate-900 rounded-2xl flex items-center justify-center border border-white/5 p-3 sm:p-4 shadow-inner">
                   {clubLogoSrc(partido.club1) ? (
                     <Image
@@ -73,31 +74,11 @@ export function HeroNextMatch({ partido }: { partido?: Partido }) {
                 </h3>
               </div>
 
-              <div className="flex flex-col items-center">
-                <div className="text-sky-500/40 font-black italic text-lg sm:text-xl mb-3 sm:mb-4">VS</div>
-                <div className="flex gap-2">
-                  <div className="flex flex-col items-center">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-slate-900 border border-sky-500/20 rounded-xl flex items-center justify-center text-lg sm:text-xl font-black text-sky-400">
-                      {countdown ? pad2(countdown.days) : "--"}
-                    </div>
-                    <span className="hidden sm:block text-[9px] uppercase tracking-widest mt-2 text-slate-500 font-bold">Days</span>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-slate-900 border border-sky-500/20 rounded-xl flex items-center justify-center text-lg sm:text-xl font-black text-sky-400">
-                      {countdown ? pad2(countdown.hours) : "--"}
-                    </div>
-                    <span className="hidden sm:block text-[9px] uppercase tracking-widest mt-2 text-slate-500 font-bold">Hours</span>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-slate-900 border border-sky-500/20 rounded-xl flex items-center justify-center text-lg sm:text-xl font-black text-sky-400">
-                      {countdown ? pad2(countdown.mins) : "--"}
-                    </div>
-                    <span className="hidden sm:block text-[9px] uppercase tracking-widest mt-2 text-slate-500 font-bold">Mins</span>
-                  </div>
-                </div>
+              <div className="flex flex-col items-center justify-center">
+                <span className="text-sky-500/40 font-black italic text-lg sm:text-xl">VS</span>
               </div>
 
-              <div className="flex flex-col items-center gap-4 min-w-0">
+              <div className="flex flex-col items-center gap-2 min-w-0">
                 <div className="size-16 sm:size-20 md:size-24 bg-slate-900 rounded-2xl flex items-center justify-center border border-white/5 p-3 sm:p-4 shadow-inner">
                   {clubLogoSrc(partido.club2) ? (
                     <Image
@@ -117,6 +98,27 @@ export function HeroNextMatch({ partido }: { partido?: Partido }) {
                 <h3 className="text-lg sm:text-xl md:text-2xl font-black tracking-tight text-white break-words">
                   {abbreviateClub(partido.equipo_visitante)}
                 </h3>
+              </div>
+            </div>
+
+            <div className="flex flex-row items-center justify-center gap-2 sm:gap-4 mb-2">
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-slate-900 border border-sky-500/20 rounded-xl flex items-center justify-center text-lg sm:text-xl font-black text-sky-400">
+                  {countdown ? pad2(countdown.days) : "--"}
+                </div>
+                <span className="hidden sm:block text-[9px] uppercase tracking-widest mt-2 text-slate-500 font-bold">Days</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-slate-900 border border-sky-500/20 rounded-xl flex items-center justify-center text-lg sm:text-xl font-black text-sky-400">
+                  {countdown ? pad2(countdown.hours) : "--"}
+                </div>
+                <span className="hidden sm:block text-[9px] uppercase tracking-widest mt-2 text-slate-500 font-bold">Hours</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-slate-900 border border-sky-500/20 rounded-xl flex items-center justify-center text-lg sm:text-xl font-black text-sky-400">
+                  {countdown ? pad2(countdown.mins) : "--"}
+                </div>
+                <span className="hidden sm:block text-[9px] uppercase tracking-widest mt-2 text-slate-500 font-bold">Mins</span>
               </div>
             </div>
 
