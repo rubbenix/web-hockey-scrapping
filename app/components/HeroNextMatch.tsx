@@ -1,14 +1,4 @@
-function abbreviateClub(name: string) {
-  // Reglas específicas
-  if (name === "JESUS MARIA I JOSEP B") return "JMJ";
-  if (name === "UNIÓ ESPORTIVA D'HORTA A") return "U.E HORTA A";
-  if (name === "JOIERIA MONER CP SANT RAMON A") return "St. RAMON";
-  if (name === "INNOAESTHETICS HC SANT JUST B") return "St. JUST B";
-  // Si cabe en una línea (<=18 caracteres), usar completo
-  if (name.length <= 18) return name;
-  // Si no, trunca a 18 caracteres
-  return name.slice(0, 18) + "…";
-}
+import { abbreviateClub } from "../lib/abbreviateClub";
 import React from "react";
 import Image from "next/image";
 import { parseFechaHora, type Partido } from "../lib/agenda";
