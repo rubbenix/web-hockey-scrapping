@@ -126,7 +126,7 @@ export function HeroNextMatch({ partido }: { partido?: Partido }) {
           </>
         ) : (
           <div className="text-slate-300 text-sm font-semibold">
-            No hay próximos partidos.
+            No hi ha pròxims partits.
           </div>
         )}
       </div>

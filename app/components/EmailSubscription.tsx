@@ -1,17 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { sileo } from "sileo";
 
-export function EmailSubscription() {
+export function EmailSubscription({ onSuccess }: { onSuccess?: () => void }) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [hidden, setHidden] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setMessage(null);
     setError(null);
 
     try {
@@ -21,16 +21,29 @@ export function EmailSubscription() {
         body: JSON.stringify({ email }),
       });
       const data = (await res.json()) as { ok?: boolean; error?: string };
-      if (!res.ok || !data.ok) throw new Error(data.error || "No se pudo registrar");
-      setMessage("Registrado. Te avisaremos si cambia la agenda.");
+      if (!res.ok || !data.ok) throw new Error(data.error || "No s'ha pogut registrar");
+
+      sileo.success({
+        title: "Correu guardat"
+      });
+
       setEmail("");
+
+      if (onSuccess) onSuccess();
+      setHidden(true);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Error";
       setError(msg);
+      sileo.error({
+        title: "No s'ha pogut guardar",
+        description: msg,
+      });
     } finally {
       setLoading(false);
     }
   }
+
+  if (hidden) return null;
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col sm:flex-row gap-2 sm:items-center">
@@ -41,7 +54,7 @@ export function EmailSubscription() {
         inputMode="email"
         autoComplete="email"
         placeholder="Tu email"
-        className="w-full sm:w-64 px-3 py-2 rounded-lg border border-blue-200 dark:border-slate-700 bg-white/90 dark:bg-slate-900 text-sm"
+        className="w-full sm:w-64 px-3 py-2 rounded-lg border border-blue-200 dark:border-slate-700 bg-white/90 dark:bg-slate-900 text-base sm:text-sm"
       />
       <button
         type="submit"
@@ -51,7 +64,6 @@ export function EmailSubscription() {
         {loading ? "Registrando..." : "Avisarme por email"}
       </button>
       <div className="text-xs">
-        {message && <span className="text-blue-700 dark:text-blue-200">{message}</span>}
         {error && <span className="text-red-600">{error}</span>}
       </div>
     </form>

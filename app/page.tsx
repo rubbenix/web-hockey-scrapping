@@ -6,7 +6,7 @@ const CATEGORIA = "BENJAMÍ OR COPA BCN 2";
 import { HeroNextMatch } from "./components/HeroNextMatch";
 import { MatchCard } from "./components/MatchCard";
 import { Section } from "./components/Section";
-import { EmailSubscription } from "./components/EmailSubscription";
+import { SubscriptionBell } from "./components/SubscriptionBell";
 import { parseFechaHora, type Partido } from "./lib/agenda";
 import { getBaseUrl } from "./lib/base-url";
 
@@ -37,18 +37,18 @@ export default async function Home() {
   return (
     <main className="min-h-screen w-full bg-gradient-to-br from-blue-100 via-sky-200 to-blue-300 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 px-3 sm:px-4 py-6 sm:py-8 flex flex-col items-center">
       <div className="w-full max-w-4xl">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+        <div className="flex flex-row items-center justify-between gap-2 mb-4">
           <span className="text-xs text-blue-700 dark:text-blue-200">
-            Última actualización: {cachedAt ? new Date(cachedAt).toLocaleString() : "-"}
+            Última actualització: {cachedAt ? new Date(cachedAt).toLocaleString() : "-"}
           </span>
-          <EmailSubscription />
+          <SubscriptionBell />
         </div>
         <HeroNextMatch partido={proximo} />
 
-        <Section title="Próximos partidos">
+        <Section title="Pròxims partits">
           <div className="space-y-4">
             {futuros.length === 0 ? (
-              <div className="text-blue-400">No hay próximos partidos.</div>
+              <div className="text-blue-400">No hi ha pròxims partits.</div>
             ) : (
               futuros.map((p, i) => <MatchCard key={`${p.fecha}-${p.hora}-${i}`} partido={p} />)
             )}
@@ -58,7 +58,7 @@ export default async function Home() {
         <Section title="Partidos jugados">
           <div className="space-y-4">
             {jugados.length === 0 ? (
-              <div className="text-blue-400">No hay partidos jugados.</div>
+              <div className="text-blue-400">No hi ha partits jugats.</div>
             ) : (
               jugados.map((p, i) => <MatchCard key={`${p.fecha}-${p.hora}-${i}`} partido={p} />)
             )}
