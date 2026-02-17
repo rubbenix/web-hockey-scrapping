@@ -9,7 +9,7 @@ function BellIcon({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       aria-hidden="true"
-      className={className}
+      className={className + ' text-sky-400'}
       fill="currentColor"
     >
       <path d="M12 22a2.02 2.02 0 0 1-2.01-2h4a2.02 2.02 0 0 1-.15.78a2.042 2.042 0 0 1-1.44 1.18h-.047A1.922 1.922 0 0 1 12 22Zm8-3H4v-2l2-1v-5.5a8.065 8.065 0 0 1 .924-4.06A4.654 4.654 0 0 1 10 4.18V2h4v2.18c2.579.614 4 2.858 4 6.32V16l2 1v2Z" />
@@ -57,7 +57,7 @@ export function SubscriptionBell() {
         aria-expanded={open}
         aria-controls={dialogId}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-blue-200 dark:border-slate-700 bg-white/90 dark:bg-slate-900 text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-60 transition"
+        className="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-blue-900 bg-slate-900 text-sky-400 hover:bg-slate-800 disabled:opacity-60 transition"
       >
         <BellIcon className="h-5 w-5" />
         <span className="sr-only">Avisa'm per email</span>
@@ -75,7 +75,7 @@ export function SubscriptionBell() {
             : "pointer-events-none opacity-0 -translate-y-1")
         }
       >
-        <div className="rounded-2xl border border-blue-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 shadow-xl backdrop-blur p-4 transition">
+        <div className="rounded-2xl border border-blue-900 bg-slate-900 shadow-xl backdrop-blur p-4 transition">
           <EmailSubscription key={open ? 'open' : 'closed'} onSuccess={() => setOpen(false)} />
         </div>
       </div>

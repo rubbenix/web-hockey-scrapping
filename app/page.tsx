@@ -35,17 +35,17 @@ export default async function Home() {
 
   const proximo = futuros[0];
   return (
-    <main className="min-h-screen w-full bg-gradient-to-br from-blue-100 via-sky-200 to-blue-300 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 px-3 sm:px-4 py-6 sm:py-8 flex flex-col items-center">
+    <main className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-3 sm:px-4 py-6 sm:py-8 flex flex-col items-center">
       <div className="w-full max-w-4xl">
         <div className="flex flex-row items-center justify-between gap-2 mb-4">
-          <span className="text-xs text-blue-700 dark:text-blue-200">
+          <span className="text-xs text-blue-200">
             Última actualització: {cachedAt ? new Date(cachedAt).toLocaleString() : "-"}
           </span>
           <SubscriptionBell />
         </div>
         <HeroNextMatch partido={proximo} />
 
-        <Section title="Pròxims partits">
+        <Section title={<span className="text-sky-400">Pròxims partits</span>}>
           <div className="space-y-4">
             {futuros.length === 0 ? (
               <div className="text-blue-400">No hi ha pròxims partits.</div>
@@ -55,10 +55,10 @@ export default async function Home() {
           </div>
         </Section>
 
-        <Section title="Partits jugats">
+        <Section title={<span className="text-sky-400">Partits jugats</span>}>
           <div className="space-y-4">
             {jugados.length === 0 ? (
-              <div className="text-black-800">No hi ha partits jugats.</div>
+              <div className="text-blue-200">No hi ha partits jugats.</div>
             ) : (
               jugados.map((p, i) => <MatchCard key={`${p.fecha}-${p.hora}-${i}`} partido={p} />)
             )}

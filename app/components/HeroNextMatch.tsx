@@ -60,7 +60,7 @@ export function HeroNextMatch({ partido }: { partido?: Partido }) {
                     </span>
                   )}
                 </div>
-                <h3 className="text-base sm:text-xl md:text-2xl font-black tracking-tight leading-tight text-center break-words">
+                <h3 className="text-base sm:text-xl md:text-2xl font-black tracking-tight leading-tight text-center break-words text-blue-200">
                   {abbreviateClub(partido.equipo_local)}
                 </h3>
               </div>
@@ -86,7 +86,7 @@ export function HeroNextMatch({ partido }: { partido?: Partido }) {
                     </span>
                   )}
                 </div>
-                <h3 className="text-base sm:text-xl md:text-2xl font-black tracking-tight leading-tight text-center break-words">
+                <h3 className="text-base sm:text-xl md:text-2xl font-black tracking-tight leading-tight text-center break-words text-blue-200">
                   {abbreviateClub(partido.equipo_visitante)}
                 </h3>
               </div>
@@ -107,18 +107,18 @@ export function HeroNextMatch({ partido }: { partido?: Partido }) {
                 </span>
               </div>
               <div className="flex flex-row items-center justify-center gap-4 sm:gap-6 mt-1">
-                <span className="text-xs sm:text-sm uppercase tracking-widest text-slate-500 font-bold px-1 sm:px-2">DIES</span>
-                <span className="text-xs sm:text-sm uppercase tracking-widest text-slate-500 font-bold px-1 sm:px-2">HORES</span>
-                <span className="text-xs sm:text-sm uppercase tracking-widest text-slate-500 font-bold px-1 sm:px-2">MIN.</span>
+                <span className="text-xs sm:text-sm uppercase tracking-widest text-blue-200 font-bold px-1 sm:px-2">DIES</span>
+                <span className="text-xs sm:text-sm uppercase tracking-widest text-blue-200 font-bold px-1 sm:px-2">HORES</span>
+                <span className="text-xs sm:text-sm uppercase tracking-widest text-blue-200 font-bold px-1 sm:px-2">MIN.</span>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-6 text-slate-300 px-4 sm:px-6 py-2">
+            <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-6 text-blue-200 px-4 sm:px-6 py-2">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold break-words text-black dark:text-slate-300">{partido.pista}</span>
+                <span className="text-xs font-bold break-words text-blue-200">{partido.pista}</span>
               </div>
               <div className="flex items-center gap-2 sm:border-l sm:border-white/10 sm:pl-6">
-                <span className="text-xs font-bold text-black dark:text-slate-300">
+                <span className="text-xs font-bold text-blue-200">
                   {partido.fecha} | {partido.hora}
                 </span>
               </div>
