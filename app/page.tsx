@@ -8,7 +8,7 @@ import { MatchCard } from "./components/MatchCard";
 import { Section } from "./components/Section";
 import { parseFechaHora, type Partido } from "./lib/agenda";
 import { getBaseUrl } from "./lib/base-url";
-import RefreshButton from "./components/RefreshButton";
+
 
 
 async function getPartidos(): Promise<{ partidos: Partido[]; cachedAt?: string }> {
