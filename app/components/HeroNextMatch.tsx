@@ -92,7 +92,7 @@ export function HeroNextMatch({ partido }: { partido?: Partido }) {
               </div>
             </div>
 
-            <div className="flex flex-col items-center justify-center mb-2 sm:mb-4">
+            <div className="flex flex-col items-center justify-center mb-2 sm:mb-4 py-6 sm:py-10">
               <div className="flex flex-row items-center justify-center gap-2 sm:gap-3">
                 <span className="text-3xl sm:text-4xl md:text-5xl font-mono font-black text-sky-400 tabular-nums">
                   {countdown ? pad2(countdown.days) : "--"}

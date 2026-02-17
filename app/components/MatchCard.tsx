@@ -40,10 +40,6 @@ export function MatchCard({ partido }: { partido: Partido }) {
           {abbreviateClub(partido.equipo_visitante)}
         </span>
       </div>
-
-      <div className="text-xs text-blue-500 dark:text-blue-300 mt-1">
-        {partido.pista}
-      </div>
     </div>
   );
 }
