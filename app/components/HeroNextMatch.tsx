@@ -66,7 +66,7 @@ export function HeroNextMatch({ partido }: { partido?: Partido }) {
               </div>
 
               <div className="flex flex-col items-center justify-center">
-                <span className="text-sky-500/40 font-black italic text-lg sm:text-xl">VS</span>
+                <span className="text-sky-500/70 font-black italic text-5xl sm:text-6xl md:text-7xl flex items-center justify-center">VS</span>
               </div>
 
               <div className="flex flex-col items-center justify-start gap-2 min-w-0 w-full">
@@ -115,10 +115,10 @@ export function HeroNextMatch({ partido }: { partido?: Partido }) {
 
             <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-6 text-slate-300 px-4 sm:px-6 py-2">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold break-words">{partido.pista}</span>
+                <span className="text-xs font-bold break-words text-black dark:text-slate-300">{partido.pista}</span>
               </div>
               <div className="flex items-center gap-2 sm:border-l sm:border-white/10 sm:pl-6">
-                <span className="text-xs font-bold">
+                <span className="text-xs font-bold text-black dark:text-slate-300">
                   {partido.fecha} | {partido.hora}
                 </span>
               </div>

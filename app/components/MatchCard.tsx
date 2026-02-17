@@ -26,7 +26,7 @@ export function MatchCard({ partido }: { partido: Partido }) {
               <span className="text-base sm:text-2xl font-black text-blue-700 dark:text-blue-300">
                 {home}
               </span>
-              <span className="text-sm sm:text-xl text-blue-400">—</span>
+              <span className="text-sm sm:text-xl text-blue-400">-</span>
               <span className="text-base sm:text-2xl font-black text-blue-700 dark:text-blue-300">
                 {away}
               </span>

@@ -55,10 +55,10 @@ export default async function Home() {
           </div>
         </Section>
 
-        <Section title="Partidos jugados">
+        <Section title="Partits jugats">
           <div className="space-y-4">
             {jugados.length === 0 ? (
-              <div className="text-blue-400">No hi ha partits jugats.</div>
+              <div className="text-black-800">No hi ha partits jugats.</div>
             ) : (
               jugados.map((p, i) => <MatchCard key={`${p.fecha}-${p.hora}-${i}`} partido={p} />)
             )}
