@@ -45,10 +45,10 @@ export async function POST(req: Request) {
     });
     const sheets = google.sheets({ version: 'v4', auth });
 
-    // Añade el email a la hoja (Sheet1, columna A)
+    // Añade el email a la hoja (emails, columna A)
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: 'Sheet1!A:A',
+      range: 'emails!A:A',
       valueInputOption: 'RAW',
       requestBody: { values: [[email, new Date().toISOString()]] },
     });
