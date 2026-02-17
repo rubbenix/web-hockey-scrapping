@@ -1,48 +1,132 @@
 import React from "react";
-import type { Partido } from "../lib/agenda";
+import Image from "next/image";
+import { parseFechaHora, type Partido } from "../lib/agenda";
+
+function pad2(n: number) {
+  return n.toString().padStart(2, "0");
+}
+
+function getCountdown(partido: Partido) {
+  const target = parseFechaHora(partido.fecha, partido.hora).getTime();
+  const now = Date.now();
+  const diffMs = Math.max(0, target - now);
+  const totalMins = Math.floor(diffMs / 60000);
+  const days = Math.floor(totalMins / (60 * 24));
+  const hours = Math.floor((totalMins % (60 * 24)) / 60);
+  const mins = totalMins % 60;
+  return { days, hours, mins };
+}
+
+function clubLogoSrc(clubId?: string) {
+  if (!clubId) return null;
+  // Logos disponibles actualmente en /public
+  // (si añades más, amplía aquí o usa un patrón de nombres consistente)
+  const map: Record<string, string> = {
+    "253": "/253.webp",
+    "246": "/246_1.webp",
+    "288": "/288_1.webp",
+    "612": "/612_1.webp",
+  };
+  return map[clubId] ?? null;
+}
 
 export function HeroNextMatch({ partido }: { partido?: Partido }) {
+  const countdown = partido ? getCountdown(partido) : null;
+
   return (
-    <section className="mb-10 w-full">
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-blue-400 dark:from-blue-900 dark:via-blue-800 dark:to-slate-900 border border-blue-200 dark:border-blue-900 shadow-2xl">
-        <div className="relative z-10 p-4 sm:p-6 lg:p-8 flex flex-col lg:flex-row items-center justify-between gap-5 sm:gap-8">
-          {partido ? (
-            <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-3 sm:gap-8 flex-1 min-w-0">
-              <div className="text-center min-w-0">
-                <p className="text-white font-extrabold text-xl sm:text-2xl md:text-3xl drop-shadow-lg leading-tight break-words">
+    <section className="relative rounded-xl overflow-hidden mb-8 bg-black border border-sky-500/20 shadow-2xl w-full">
+      <div className="relative z-10 p-6 flex flex-col items-center text-center">
+
+        {partido ? (
+          <>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 mb-6">
+              <div className="flex flex-col items-center gap-4 min-w-0">
+                <div className="size-24 bg-slate-900 rounded-2xl flex items-center justify-center border border-white/5 p-4 shadow-inner">
+                  {clubLogoSrc(partido.club1) ? (
+                    <Image
+                      src={clubLogoSrc(partido.club1)!}
+                      alt={partido.equipo_local}
+                      width={96}
+                      height={96}
+                      className="h-16 w-16 object-contain"
+                      priority
+                    />
+                  ) : (
+                    <span className="text-3xl font-black text-sky-400">
+                      {partido.equipo_local.slice(0, 2).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-2xl font-black tracking-tight text-white break-words">
                   {partido.equipo_local}
-                </p>
+                </h3>
               </div>
-              <div className="text-center">
-                <span className="text-white font-black text-3xl sm:text-4xl md:text-5xl italic px-4 sm:px-6 drop-shadow-lg">
-                  VS
+
+              <div className="flex flex-col items-center">
+                <div className="text-sky-500/40 font-black italic text-xl mb-4">VS</div>
+                <div className="flex gap-2">
+                  <div className="flex flex-col items-center">
+                    <div className="w-14 h-14 bg-slate-900 border border-sky-500/20 rounded-xl flex items-center justify-center text-xl font-black text-sky-400">
+                      {countdown ? pad2(countdown.days) : "--"}
+                    </div>
+                    <span className="text-[9px] uppercase tracking-widest mt-2 text-slate-500 font-bold">Days</span>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <div className="w-14 h-14 bg-slate-900 border border-sky-500/20 rounded-xl flex items-center justify-center text-xl font-black text-sky-400">
+                      {countdown ? pad2(countdown.hours) : "--"}
+                    </div>
+                    <span className="text-[9px] uppercase tracking-widest mt-2 text-slate-500 font-bold">Hours</span>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <div className="w-14 h-14 bg-slate-900 border border-sky-500/20 rounded-xl flex items-center justify-center text-xl font-black text-sky-400">
+                      {countdown ? pad2(countdown.mins) : "--"}
+                    </div>
+                    <span className="text-[9px] uppercase tracking-widest mt-2 text-slate-500 font-bold">Mins</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center gap-4 min-w-0">
+                <div className="size-24 bg-slate-900 rounded-2xl flex items-center justify-center border border-white/5 p-4 shadow-inner">
+                  {clubLogoSrc(partido.club2) ? (
+                    <Image
+                      src={clubLogoSrc(partido.club2)!}
+                      alt={partido.equipo_visitante}
+                      width={96}
+                      height={96}
+                      className="h-16 w-16 object-contain"
+                      priority
+                    />
+                  ) : (
+                    <span className="text-3xl font-black text-slate-400">
+                      {partido.equipo_visitante.slice(0, 2).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-2xl font-black tracking-tight text-white break-words">
+                  {partido.equipo_visitante}
+                </h3>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-6 text-slate-300 bg-slate-900/40 px-6 py-2.5 rounded-xl border border-white/5">
+              <div className="flex items-center gap-2">
+                <span className="text-sky-400 text-xs font-black">LLOC</span>
+                <span className="text-xs font-bold break-words">{partido.pista}</span>
+              </div>
+              <div className="flex items-center gap-2 md:border-l md:border-white/10 md:pl-6">
+                <span className="text-sky-400 text-xs font-black">DATA</span>
+                <span className="text-xs font-bold">
+                  {partido.fecha} | {partido.hora}
                 </span>
               </div>
-              <div className="text-center min-w-0">
-                <p className="text-white font-extrabold text-xl sm:text-2xl md:text-3xl drop-shadow-lg leading-tight break-words">
-                  {partido.equipo_visitante}
-                </p>
-              </div>
             </div>
-          ) : (
-            <div className="flex-1 text-center text-white">
-              No hay próximos partidos.
-            </div>
-          )}
-
-          {partido && (
-            <div className="flex-1 text-center lg:text-left mt-6 lg:mt-0">
-              <span className="inline-flex items-center gap-1.5 py-1 px-4 rounded-full bg-white/20 text-white text-xs font-bold uppercase tracking-wider mb-4 border border-white/30 shadow">
-                Próximo partido
-              </span>
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-blue-100">
-                <span className="text-sm font-medium">{partido.fecha}</span>
-                <span className="text-sm font-medium">{partido.hora}</span>
-                <span className="text-sm font-medium">{partido.pista}</span>
-              </div>
-            </div>
-          )}
-        </div>
+          </>
+        ) : (
+          <div className="text-slate-300 text-sm font-semibold">
+            No hay próximos partidos.
+          </div>
+        )}
       </div>
     </section>
   );
