@@ -16,8 +16,14 @@ export function MatchCard({ partido }: { partido: Partido }) {
 
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1 sm:gap-3">
 
-        <span className="font-bold text-sm sm:text-base text-blue-900 dark:text-blue-100 min-w-0 truncate text-left">
-          {abbreviateClub(partido.equipo_local)}
+        <span className="font-bold text-sm sm:text-base text-blue-300 min-w-0 truncate text-center block">
+          {(() => {
+            const name = abbreviateClub(partido.equipo_local);
+            if (name.length <= 13) return name;
+            const breakIndex = name.lastIndexOf(' ', 13);
+            if (breakIndex === -1) return name;
+            return <>{name.slice(0, breakIndex)}<br />{name.slice(breakIndex + 1)}</>;
+          })()}
         </span>
 
         <span className="justify-self-center text-center w-14 sm:w-20">
@@ -36,8 +42,14 @@ export function MatchCard({ partido }: { partido: Partido }) {
           )}
         </span>
 
-        <span className="font-bold text-sm sm:text-base text-blue-900 dark:text-blue-100 min-w-0 truncate text-right">
-          {abbreviateClub(partido.equipo_visitante)}
+        <span className="font-bold text-sm sm:text-base text-blue-300 min-w-0 truncate text-center block">
+          {(() => {
+            const name = abbreviateClub(partido.equipo_visitante);
+            if (name.length <= 13) return name;
+            const breakIndex = name.lastIndexOf(' ', 13);
+            if (breakIndex === -1) return name;
+            return <>{name.slice(0, breakIndex)}<br />{name.slice(breakIndex + 1)}</>;
+          })()}
         </span>
       </div>
     </div>
