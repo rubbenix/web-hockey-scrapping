@@ -53,7 +53,7 @@ export function EmailSubscription({ onSuccess }: { onSuccess?: () => void }) {
         type="email"
         inputMode="email"
         autoComplete="email"
-        placeholder="Tu email"
+        placeholder="El teu email"
         className="w-full sm:w-64 px-3 py-2 rounded-lg border border-blue-200 dark:border-slate-700 bg-white/90 dark:bg-slate-900 text-base sm:text-sm"
       />
       <button
@@ -61,7 +61,7 @@ export function EmailSubscription({ onSuccess }: { onSuccess?: () => void }) {
         disabled={loading}
         className="px-3 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-60 text-sm"
       >
-        {loading ? "Registrando..." : "Avisarme por email"}
+        {loading ? "Registrando..." : "Avisa'm per email"}
       </button>
       <div className="text-xs">
         {error && <span className="text-red-600">{error}</span>}

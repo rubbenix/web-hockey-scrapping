@@ -60,7 +60,7 @@ export function SubscriptionBell() {
         className="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-blue-200 dark:border-slate-700 bg-white/90 dark:bg-slate-900 text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-60 transition"
       >
         <BellIcon className="h-5 w-5" />
-        <span className="sr-only">Avisarme por email</span>
+        <span className="sr-only">Avisa'm per email</span>
       </button>
 
       <div
