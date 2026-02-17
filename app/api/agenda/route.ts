@@ -113,19 +113,24 @@ export async function GET(request: Request) {
 
     const nextCachedAt = new Date().toISOString();
 
+    let notified: number | undefined;
+    let notifyError: string | undefined;
+
     // Comparar con el antiguo y notificar si hay cambios
     const partidosChanged = JSON.stringify(oldData.partidos) !== JSON.stringify(partidos);
     if (partidosChanged) {
       try {
         const baseUrl = `${new URL(request.url).protocol}//${new URL(request.url).host}`;
-        await notifyAgendaChanged({
+        const res = await notifyAgendaChanged({
           baseUrl,
           before: oldData.partidos,
           after: partidos,
           cachedAt: nextCachedAt,
         });
+        notified = res.notified;
       } catch (e) {
         // Si falla el email, no romper la API
+        notifyError = getErrorMessage(e);
         console.error("Error enviando notificación de agenda:", e);
       }
     }
@@ -137,7 +142,15 @@ export async function GET(request: Request) {
       "utf-8"
     );
 
-    return NextResponse.json({ partidos, cachedAt: nextCachedAt });
+    const payload: Record<string, unknown> = { partidos, cachedAt: nextCachedAt };
+    // Solo añadir diagnóstico cuando se ha intentado actualizar (refresh manual o a la hora programada)
+    if (forceRefresh || allowed) {
+      payload.partidosChanged = partidosChanged;
+      payload.notified = notified ?? 0;
+      if (notifyError) payload.notifyError = notifyError;
+    }
+
+    return NextResponse.json(payload);
   } catch (e: unknown) {
     // Si hay error y hay caché, devolver caché
     if (cache) {

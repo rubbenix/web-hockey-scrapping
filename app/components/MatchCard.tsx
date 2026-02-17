@@ -7,7 +7,6 @@ export function MatchCard({ partido }: { partido: Partido }) {
   return (
     <div className="bg-white/90 dark:bg-slate-800/80 p-5 rounded-2xl border border-blue-200 dark:border-blue-900 shadow-lg flex flex-col gap-2">
       <div className="mb-1 text-xs font-bold text-blue-700 dark:text-blue-200 uppercase tracking-wide">
-        <div className="break-words">{partido.categoria}</div>
         <div className="text-blue-600/90 dark:text-blue-200/90">
           {partido.fecha} {partido.hora}
         </div>

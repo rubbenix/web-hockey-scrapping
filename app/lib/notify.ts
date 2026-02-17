@@ -24,6 +24,31 @@ function badge(label: string, bg: string, fg: string) {
   return `<span style="display:inline-block;padding:2px 8px;border-radius:999px;background:${bg};color:${fg};font-size:12px;line-height:18px;font-weight:600;">${escapeHtml(label)}</span>`;
 }
 
+function formatCachedAtDisplay(iso: string) {
+  const d = new Date(iso);
+  if (!Number.isFinite(d.getTime())) return iso;
+
+  const parts = new Intl.DateTimeFormat("es-ES", {
+    timeZone: "Europe/Madrid",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(d);
+
+  const map = Object.fromEntries(parts.map((p) => [p.type, p.value]));
+  const day = map.day ?? "";
+  const month = map.month ?? "";
+  const year = map.year ?? "";
+  const hour = map.hour ?? "";
+  const minute = map.minute ?? "";
+
+  if (!day || !month || !year || !hour || !minute) return iso;
+  return `${day}-${month}-${year} ${hour}:${minute}`;
+}
+
 export async function notifyAgendaChanged(opts: {
   baseUrl: string;
   before: Partido[];
@@ -39,7 +64,8 @@ export async function notifyAgendaChanged(opts: {
   const subject = "Agenda actualitzada";
   const maxItems = 10;
   const safeBaseUrl = escapeHtml(opts.baseUrl);
-  const safeCachedAt = escapeHtml(opts.cachedAt);
+  const cachedAtDisplay = formatCachedAtDisplay(opts.cachedAt);
+  const safeCachedAt = escapeHtml(cachedAtDisplay);
 
   const sumBadges = [
     badge(`+${added.length} afegits`, "#dcfce7", "#166534"),
@@ -64,7 +90,6 @@ export async function notifyAgendaChanged(opts: {
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:680px;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,0.06);">
             <tr>
               <td style="padding:18px 20px;background:#0b4ea2;color:#ffffff;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;">
-                <div style="font-size:14px;opacity:0.9;">Avís d'agenda</div>
                 <div style="font-size:22px;font-weight:800;line-height:28px;">S'ha actualitzat l'agenda</div>
               </td>
             </tr>
@@ -129,10 +154,10 @@ export async function notifyAgendaChanged(opts: {
       const sub = `${escapeHtml(after.fecha)} · ${escapeHtml(after.hora)} · ${escapeHtml(after.pista)}`;
 
       const diffs: string[] = [];
-      if (before.fecha !== after.fecha) diffs.push(`<tr><td style="padding:6px 10px;color:#6b7280;font-size:12px;">Fecha</td><td style="padding:6px 10px;font-size:12px;"><span style="text-decoration:line-through;color:#9ca3af;">${escapeHtml(before.fecha)}</span></td><td style="padding:6px 10px;font-size:12px;font-weight:700;color:#111827;">${escapeHtml(after.fecha)}</td></tr>`);
+      if (before.fecha !== after.fecha) diffs.push(`<tr><td style="padding:6px 10px;color:#6b7280;font-size:12px;">Data</td><td style="padding:6px 10px;font-size:12px;"><span style="text-decoration:line-through;color:#9ca3af;">${escapeHtml(before.fecha)}</span></td><td style="padding:6px 10px;font-size:12px;font-weight:700;color:#111827;">${escapeHtml(after.fecha)}</td></tr>`);
       if (before.hora !== after.hora) diffs.push(`<tr><td style="padding:6px 10px;color:#6b7280;font-size:12px;">Hora</td><td style="padding:6px 10px;font-size:12px;"><span style="text-decoration:line-through;color:#9ca3af;">${escapeHtml(before.hora)}</span></td><td style="padding:6px 10px;font-size:12px;font-weight:700;color:#111827;">${escapeHtml(after.hora)}</td></tr>`);
       if (before.pista !== after.pista) diffs.push(`<tr><td style="padding:6px 10px;color:#6b7280;font-size:12px;">Pista</td><td style="padding:6px 10px;font-size:12px;"><span style="text-decoration:line-through;color:#9ca3af;">${escapeHtml(before.pista)}</span></td><td style="padding:6px 10px;font-size:12px;font-weight:700;color:#111827;">${escapeHtml(after.pista)}</td></tr>`);
-      if (before.resultado !== after.resultado) diffs.push(`<tr><td style="padding:6px 10px;color:#6b7280;font-size:12px;">Resultado</td><td style="padding:6px 10px;font-size:12px;"><span style="text-decoration:line-through;color:#9ca3af;">${escapeHtml(before.resultado ?? "-")}</span></td><td style="padding:6px 10px;font-size:12px;font-weight:700;color:#111827;">${escapeHtml(after.resultado ?? "-")}</td></tr>`);
+      if (before.resultado !== after.resultado) diffs.push(`<tr><td style="padding:6px 10px;color:#6b7280;font-size:12px;">Resultat</td><td style="padding:6px 10px;font-size:12px;"><span style="text-decoration:line-through;color:#9ca3af;">${escapeHtml(before.resultado ?? "-")}</span></td><td style="padding:6px 10px;font-size:12px;font-weight:700;color:#111827;">${escapeHtml(after.resultado ?? "-")}</td></tr>`);
 
       const diffRows = diffs.join("");
 
@@ -142,9 +167,9 @@ export async function notifyAgendaChanged(opts: {
           <div style="margin-top:2px;font-size:12px;color:#6b7280;">${escapeHtml(sub)}</div>
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin-top:10px;border-collapse:collapse;background:#ffffff;border-radius:10px;overflow:hidden;">
             <tr>
-              <th align="left" style="padding:8px 10px;background:#fff7ed;border-bottom:1px solid #fee6c7;color:#9a3412;font-size:12px;font-weight:800;">Campo</th>
-              <th align="left" style="padding:8px 10px;background:#fff7ed;border-bottom:1px solid #fee6c7;color:#9a3412;font-size:12px;font-weight:800;">Antes</th>
-              <th align="left" style="padding:8px 10px;background:#fff7ed;border-bottom:1px solid #fee6c7;color:#9a3412;font-size:12px;font-weight:800;">Ahora</th>
+              <th align="left" style="padding:8px 10px;background:#fff7ed;border-bottom:1px solid #fee6c7;color:#9a3412;font-size:12px;font-weight:800;"></th>
+              <th align="left" style="padding:8px 10px;background:#fff7ed;border-bottom:1px solid #fee6c7;color:#9a3412;font-size:12px;font-weight:800;">Abans</th>
+              <th align="left" style="padding:8px 10px;background:#fff7ed;border-bottom:1px solid #fee6c7;color:#9a3412;font-size:12px;font-weight:800;">Ara</th>
             </tr>
             ${diffRows}
           </table>
@@ -193,7 +218,7 @@ export async function notifyAgendaChanged(opts: {
       to: [email],
       subject,
       text:
-        `S'ha detectat un canvi a l'agenda (${opts.cachedAt}).\n` +
+        `S'ha detectat un canvi a l'agenda (${cachedAtDisplay}).\n` +
         `Resum: +${added.length} afegits, -${removed.length} eliminats, ~${changed.length} modificats.\n\n` +
         `Veure l'agenda: ${opts.baseUrl}/\n\n` +
         `Baixa: ${unsubUrl}`,

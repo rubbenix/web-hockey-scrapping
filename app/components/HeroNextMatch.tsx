@@ -35,9 +35,6 @@ export function HeroNextMatch({ partido }: { partido?: Partido }) {
               <span className="inline-flex items-center gap-1.5 py-1 px-4 rounded-full bg-white/20 text-white text-xs font-bold uppercase tracking-wider mb-4 border border-white/30 shadow">
                 Próximo partido
               </span>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-2 tracking-tight drop-shadow-lg break-words">
-                {partido.categoria}
-              </h2>
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 text-blue-100">
                 <span className="text-sm font-medium">{partido.fecha}</span>
                 <span className="text-sm font-medium">{partido.hora}</span>
