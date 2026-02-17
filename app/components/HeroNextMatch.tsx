@@ -1,3 +1,14 @@
+function abbreviateClub(name: string) {
+  // Reglas específicas
+  if (name === "JESUS MARIA I JOSEP B") return "JMJ";
+  if (name === "UNIÓ ESPORTIVA D'HORTA A") return "U.E HORTA A";
+  if (name === "JOIERIA MONER CP SANT RAMON A") return "St. RAMON";
+  if (name === "INNOAESTHETICS HC SANT JUST B") return "St. JUST B";
+  // Si cabe en una línea (<=18 caracteres), usar completo
+  if (name.length <= 18) return name;
+  // Si no, trunca a 18 caracteres
+  return name.slice(0, 18) + "…";
+}
 import React from "react";
 import Image from "next/image";
 import { parseFechaHora, type Partido } from "../lib/agenda";
@@ -34,21 +45,21 @@ export function HeroNextMatch({ partido }: { partido?: Partido }) {
   const countdown = partido ? getCountdown(partido) : null;
 
   return (
-    <section className="relative rounded-xl overflow-hidden mb-8 bg-black border border-sky-500/20 shadow-2xl w-full">
-      <div className="relative z-10 p-6 flex flex-col items-center text-center">
+    <section className="relative rounded-xl overflow-hidden mb-8 bg-slate-900 border border-sky-500/20 shadow-2xl w-full">
+      <div className="relative z-10 p-4 sm:p-6 flex flex-col items-center text-center">
 
         {partido ? (
           <>
-            <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 mb-6">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-5 sm:gap-8 md:gap-16 mb-4 sm:mb-6">
               <div className="flex flex-col items-center gap-4 min-w-0">
-                <div className="size-24 bg-slate-900 rounded-2xl flex items-center justify-center border border-white/5 p-4 shadow-inner">
+                <div className="size-16 sm:size-20 md:size-24 bg-slate-900 rounded-2xl flex items-center justify-center border border-white/5 p-3 sm:p-4 shadow-inner">
                   {clubLogoSrc(partido.club1) ? (
                     <Image
                       src={clubLogoSrc(partido.club1)!}
                       alt={partido.equipo_local}
                       width={96}
                       height={96}
-                      className="h-16 w-16 object-contain"
+                      className="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 object-contain"
                       priority
                     />
                   ) : (
@@ -57,44 +68,44 @@ export function HeroNextMatch({ partido }: { partido?: Partido }) {
                     </span>
                   )}
                 </div>
-                <h3 className="text-2xl font-black tracking-tight text-white break-words">
-                  {partido.equipo_local}
+                <h3 className="text-lg sm:text-xl md:text-2xl font-black tracking-tight text-white break-words">
+                  {abbreviateClub(partido.equipo_local)}
                 </h3>
               </div>
 
               <div className="flex flex-col items-center">
-                <div className="text-sky-500/40 font-black italic text-xl mb-4">VS</div>
+                <div className="text-sky-500/40 font-black italic text-lg sm:text-xl mb-3 sm:mb-4">VS</div>
                 <div className="flex gap-2">
                   <div className="flex flex-col items-center">
-                    <div className="w-14 h-14 bg-slate-900 border border-sky-500/20 rounded-xl flex items-center justify-center text-xl font-black text-sky-400">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-slate-900 border border-sky-500/20 rounded-xl flex items-center justify-center text-lg sm:text-xl font-black text-sky-400">
                       {countdown ? pad2(countdown.days) : "--"}
                     </div>
-                    <span className="text-[9px] uppercase tracking-widest mt-2 text-slate-500 font-bold">Days</span>
+                    <span className="hidden sm:block text-[9px] uppercase tracking-widest mt-2 text-slate-500 font-bold">Days</span>
                   </div>
                   <div className="flex flex-col items-center">
-                    <div className="w-14 h-14 bg-slate-900 border border-sky-500/20 rounded-xl flex items-center justify-center text-xl font-black text-sky-400">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-slate-900 border border-sky-500/20 rounded-xl flex items-center justify-center text-lg sm:text-xl font-black text-sky-400">
                       {countdown ? pad2(countdown.hours) : "--"}
                     </div>
-                    <span className="text-[9px] uppercase tracking-widest mt-2 text-slate-500 font-bold">Hours</span>
+                    <span className="hidden sm:block text-[9px] uppercase tracking-widest mt-2 text-slate-500 font-bold">Hours</span>
                   </div>
                   <div className="flex flex-col items-center">
-                    <div className="w-14 h-14 bg-slate-900 border border-sky-500/20 rounded-xl flex items-center justify-center text-xl font-black text-sky-400">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-slate-900 border border-sky-500/20 rounded-xl flex items-center justify-center text-lg sm:text-xl font-black text-sky-400">
                       {countdown ? pad2(countdown.mins) : "--"}
                     </div>
-                    <span className="text-[9px] uppercase tracking-widest mt-2 text-slate-500 font-bold">Mins</span>
+                    <span className="hidden sm:block text-[9px] uppercase tracking-widest mt-2 text-slate-500 font-bold">Mins</span>
                   </div>
                 </div>
               </div>
 
               <div className="flex flex-col items-center gap-4 min-w-0">
-                <div className="size-24 bg-slate-900 rounded-2xl flex items-center justify-center border border-white/5 p-4 shadow-inner">
+                <div className="size-16 sm:size-20 md:size-24 bg-slate-900 rounded-2xl flex items-center justify-center border border-white/5 p-3 sm:p-4 shadow-inner">
                   {clubLogoSrc(partido.club2) ? (
                     <Image
                       src={clubLogoSrc(partido.club2)!}
                       alt={partido.equipo_visitante}
                       width={96}
                       height={96}
-                      className="h-16 w-16 object-contain"
+                      className="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 object-contain"
                       priority
                     />
                   ) : (
@@ -103,18 +114,18 @@ export function HeroNextMatch({ partido }: { partido?: Partido }) {
                     </span>
                   )}
                 </div>
-                <h3 className="text-2xl font-black tracking-tight text-white break-words">
-                  {partido.equipo_visitante}
+                <h3 className="text-lg sm:text-xl md:text-2xl font-black tracking-tight text-white break-words">
+                  {abbreviateClub(partido.equipo_visitante)}
                 </h3>
               </div>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-6 text-slate-300 bg-slate-900/40 px-6 py-2.5 rounded-xl border border-white/5">
+            <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-6 text-slate-300 bg-slate-900/40 px-4 sm:px-6 py-2 rounded-xl border border-white/5">
               <div className="flex items-center gap-2">
-                <span className="text-sky-400 text-xs font-black">LLOC</span>
+                <span className="text-sky-400 text-xs font-black">UBI</span>
                 <span className="text-xs font-bold break-words">{partido.pista}</span>
               </div>
-              <div className="flex items-center gap-2 md:border-l md:border-white/10 md:pl-6">
+              <div className="flex items-center gap-2 sm:border-l sm:border-white/10 sm:pl-6">
                 <span className="text-sky-400 text-xs font-black">DATA</span>
                 <span className="text-xs font-bold">
                   {partido.fecha} | {partido.hora}
