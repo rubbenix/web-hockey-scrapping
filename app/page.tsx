@@ -43,7 +43,7 @@ export default async function Home() {
           <span className="text-xs text-blue-700 dark:text-blue-200">
             Última actualización: {cachedAt ? new Date(cachedAt).toLocaleString() : "-"}
           </span>
-          <RefreshButton />
+          {/*<RefreshButton />*/}
         </div>
         <HeroNextMatch partido={proximo} />
 
