@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { addSubscriber, removeSubscriber, verifyUnsubscribeToken } from "@/app/lib/subscriptions";
+import { removeSubscriber, verifyUnsubscribeToken } from "@/app/lib/subscriptions";
+import { google } from 'googleapis';
 
 export const runtime = "nodejs";
 
@@ -24,14 +25,37 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const body = (await req.json()) as { email?: string };
-    if (!body.email) {
-      return NextResponse.json({ error: "Falta email" }, { status: 400 });
+    const { email } = await req.json();
+    if (!email || typeof email !== 'string') {
+      return NextResponse.json({ ok: false, error: 'Email requerido' }, { status: 400 });
     }
-    const emails = await addSubscriber(body.email);
-    return NextResponse.json({ ok: true, count: emails.length });
-  } catch (e: unknown) {
-    return NextResponse.json({ error: getErrorMessage(e) }, { status: 400 });
+
+    // Carga credenciales desde variables de entorno
+    const client_email = process.env.GS_CLIENT_EMAIL;
+    const private_key = process.env.GS_PRIVATE_KEY?.replace(/\\n/g, '\n');
+    const spreadsheetId = process.env.GS_SPREADSHEET_ID;
+    if (!client_email || !private_key || !spreadsheetId) {
+      return NextResponse.json({ ok: false, error: 'Faltan credenciales de Google Sheets' }, { status: 500 });
+    }
+
+    const auth = new google.auth.JWT({
+      email: client_email,
+      key: private_key,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    // Añade el email a la hoja (Sheet1, columna A)
+    await sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range: 'Sheet1!A:A',
+      valueInputOption: 'RAW',
+      requestBody: { values: [[email, new Date().toISOString()]] },
+    });
+
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    return NextResponse.json({ ok: false, error: getErrorMessage(e) }, { status: 500 });
   }
 }
 
