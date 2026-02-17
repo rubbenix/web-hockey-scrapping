@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import * as cheerio from "cheerio";
 import { promises as fs } from "fs";
 import path from "path";
+import { computeAgendaHash } from "@/app/lib/agenda-hash";
+import { notifyAgendaChanged } from "@/app/lib/notify";
 
 export const runtime = "nodejs";
 // El revalidate ya no es necesario, controlamos el refresco manualmente
@@ -21,30 +23,45 @@ export type Partido = {
   club2?: string;
 };
 
+function getErrorMessage(err: unknown) {
+  if (err instanceof Error) return err.message;
+  return typeof err === "string" ? err : "Error";
+}
+
 export async function GET(request: Request) {
   // Permitir recarga manual con ?refresh=1
   const url = new URL(request.url);
   const forceRefresh = url.searchParams.get("refresh") === "1";
-  // Horas permitidas: 12:00, 20:00, 00:00
   const now = new Date();
   const hours = now.getHours();
   const minutes = now.getMinutes();
-  const allowed = ([12, 20, 0].includes(hours) && minutes === 0);
+  // Solo permitir actualización a las 18:00
+  const allowed = (hours === 18 && minutes === 0);
 
   // Leer caché si existe
-  let cache: any = null;
+  let cache: unknown = null;
   try {
-    const raw = await fs.readFile(DATA_PATH, "utf-8");
+    const raw = await fs.readFile(path.join(path.dirname(DATA_PATH), "ben.json"), "utf-8");
     cache = JSON.parse(raw);
   } catch {}
 
+  const cachedObj = (cache && typeof cache === "object") ? (cache as Record<string, unknown>) : null;
+
   // Si no es hora permitida y no es refresh manual, devolver caché si existe
-  if (!forceRefresh && !allowed && cache) {
-    return NextResponse.json({ partidos: cache.partidos, cachedAt: cache.cachedAt });
+  if (!forceRefresh && !allowed && cachedObj) {
+    return NextResponse.json({ partidos: cachedObj.partidos, cachedAt: cachedObj.cachedAt });
   }
 
   // Intentar obtener datos frescos
   try {
+    const BEN_PATH = path.join(path.dirname(DATA_PATH), "ben.json");
+    // Leer el antiguo ben.json
+    let oldData: { partidos: Partido[]; cachedAt?: string } = { partidos: [] };
+    try {
+      const oldRaw = await fs.readFile(BEN_PATH, "utf-8");
+      oldData = JSON.parse(oldRaw);
+    } catch {}
+
     const response = await fetch(FECAPA_URL, {
       method: "POST",
       headers: {
@@ -73,27 +90,59 @@ export async function GET(request: Request) {
       const resultado = typeof resultadoRaw === "string" && resultadoRaw.includes("-")
         ? resultadoRaw.trim()
         : null;
-      partidos.push({
-        categoria,
-        fecha,
-        hora,
-        equipo_local,
-        equipo_visitante,
-        resultado,
-        pista,
-        club1: $(el).attr("club1") || undefined,
-        club2: $(el).attr("club2") || undefined,
-      });
+      const club1 = $(el).attr("club1") || undefined;
+      const club2 = $(el).attr("club2") || undefined;
+      if (
+        (club1 === "253" || club2 === "253") &&
+        (equipo_local === "JESUS MARIA I JOSEP B" || equipo_visitante === "JESUS MARIA I JOSEP B") &&
+        categoria === "BCN BENJAMÍ OR COPA BCN 2"
+      ) {
+        partidos.push({
+          categoria,
+          fecha,
+          hora,
+          equipo_local,
+          equipo_visitante,
+          resultado,
+          pista,
+          club1,
+          club2,
+        });
+      }
     });
-    // Guardar en caché
-    await fs.mkdir(path.dirname(DATA_PATH), { recursive: true });
-    await fs.writeFile(DATA_PATH, JSON.stringify({ partidos, cachedAt: new Date().toISOString() }), "utf-8");
-    return NextResponse.json({ partidos, cachedAt: new Date().toISOString() });
-  } catch (e: any) {
+
+    const nextCachedAt = new Date().toISOString();
+
+    // Comparar con el antiguo y notificar si hay cambios
+    const partidosChanged = JSON.stringify(oldData.partidos) !== JSON.stringify(partidos);
+    if (partidosChanged) {
+      try {
+        const baseUrl = `${new URL(request.url).protocol}//${new URL(request.url).host}`;
+        await notifyAgendaChanged({
+          baseUrl,
+          before: oldData.partidos,
+          after: partidos,
+          cachedAt: nextCachedAt,
+        });
+      } catch (e) {
+        // Si falla el email, no romper la API
+        console.error("Error enviando notificación de agenda:", e);
+      }
+    }
+
+    // Guardar el nuevo ben.json
+    await fs.writeFile(
+      BEN_PATH,
+      JSON.stringify({ partidos, cachedAt: nextCachedAt }, null, 2),
+      "utf-8"
+    );
+
+    return NextResponse.json({ partidos, cachedAt: nextCachedAt });
+  } catch (e: unknown) {
     // Si hay error y hay caché, devolver caché
     if (cache) {
-      return NextResponse.json({ partidos: cache.partidos, cachedAt: cache.cachedAt, error: e.message });
+      return NextResponse.json({ partidos: cachedObj?.partidos, cachedAt: cachedObj?.cachedAt, error: getErrorMessage(e) });
     }
-    return NextResponse.json({ error: e.message }, { status: 500 });
+    return NextResponse.json({ error: getErrorMessage(e) }, { status: 500 });
   }
 }

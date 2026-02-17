@@ -1,0 +1,137 @@
+{
+  "partidos": [
+    {
+      "categoria": "BCN BENJAMÍ OR COPA BCN 2",
+      "fecha": "31/01/2026",
+      "hora": "11:15",
+      "equipo_local": "JESUS MARIA I JOSEP B",
+      "equipo_visitante": "INNOAESTHETICS HC SANT JUST B",
+      "resultado": "10 - 2",
+      "pista": "COL·LEGI JESÚS, MARIA, I JOSEP",
+      "club1": "253",
+      "club2": "288"
+    },
+    {
+      "categoria": "BCN BENJAMÍ OR COPA BCN 2",
+      "fecha": "07/02/2026",
+      "hora": "12:15",
+      "equipo_local": "JESUS MARIA I JOSEP B",
+      "equipo_visitante": "CP CONGRÉS-LA SAGRERA ES MOU D",
+      "resultado": "6 - 2",
+      "pista": "COL·LEGI JESÚS, MARIA, I JOSEP",
+      "club1": "253",
+      "club2": "246"
+    },
+    {
+      "categoria": "BCN BENJAMÍ OR COPA BCN 2",
+      "fecha": "22/02/2026",
+      "hora": "11:00",
+      "equipo_local": "JESUS MARIA I JOSEP B",
+      "equipo_visitante": "CP MONTESQUIU A",
+      "resultado": null,
+      "pista": "COL·LEGI JESÚS, MARIA, I JOSEP",
+      "club1": "253",
+      "club2": "612"
+    },
+    {
+      "categoria": "BCN BENJAMÍ OR COPA BCN 2",
+      "fecha": "28/02/2026",
+      "hora": "15:00",
+      "equipo_local": "UNIÓ ESPORTIVA D'HORTA A",
+      "equipo_visitante": "JESUS MARIA I JOSEP B",
+      "resultado": null,
+      "pista": "PISTA UE HORTA",
+      "club1": "251",
+      "club2": "253"
+    },
+    {
+      "categoria": "BCN BENJAMÍ OR COPA BCN 2",
+      "fecha": "14/03/2026",
+      "hora": "12:00",
+      "equipo_local": "JESUS MARIA I JOSEP B",
+      "equipo_visitante": "CE ARENYS DE MUNT B",
+      "resultado": null,
+      "pista": "COL·LEGI JESÚS, MARIA, I JOSEP",
+      "club1": "253",
+      "club2": "232"
+    },
+    {
+      "categoria": "BCN BENJAMÍ OR COPA BCN 2",
+      "fecha": "21/03/2026",
+      "hora": "10:00",
+      "equipo_local": "JOIERIA MONER CP SANT RAMON A",
+      "equipo_visitante": "JESUS MARIA I JOSEP B",
+      "resultado": null,
+      "pista": "POLIESPORTIU DE VILAFRANCA",
+      "club1": "289",
+      "club2": "253"
+    },
+    {
+      "categoria": "BCN BENJAMÍ OR COPA BCN 2",
+      "fecha": "28/03/2026",
+      "hora": "10:00",
+      "equipo_local": "INNOAESTHETICS HC SANT JUST B",
+      "equipo_visitante": "JESUS MARIA I JOSEP B",
+      "resultado": null,
+      "pista": "PAVELLO SANT JUST",
+      "club1": "288",
+      "club2": "253"
+    },
+    {
+      "categoria": "BCN BENJAMÍ OR COPA BCN 2",
+      "fecha": "11/04/2026",
+      "hora": "15:00",
+      "equipo_local": "CP CONGRÉS-LA SAGRERA ES MOU D",
+      "equipo_visitante": "JESUS MARIA I JOSEP B",
+      "resultado": null,
+      "pista": "POLIESPORTIU MUNICIPAL CAMP DEL FERRO",
+      "club1": "246",
+      "club2": "253"
+    },
+    {
+      "categoria": "BCN BENJAMÍ OR COPA BCN 2",
+      "fecha": "18/04/2026",
+      "hora": "11:15",
+      "equipo_local": "CP MONTESQUIU A",
+      "equipo_visitante": "JESUS MARIA I JOSEP B",
+      "resultado": null,
+      "pista": "PAVELLO MONTESQUIU",
+      "club1": "612",
+      "club2": "253"
+    },
+    {
+      "categoria": "BCN BENJAMÍ OR COPA BCN 2",
+      "fecha": "25/04/2026",
+      "hora": "15:00",
+      "equipo_local": "JESUS MARIA I JOSEP B",
+      "equipo_visitante": "UNIÓ ESPORTIVA D'HORTA A",
+      "resultado": null,
+      "pista": "COL·LEGI JESÚS, MARIA, I JOSEP",
+      "club1": "253",
+      "club2": "251"
+    },
+    {
+      "categoria": "BCN BENJAMÍ OR COPA BCN 2",
+      "fecha": "24/05/2026",
+      "hora": "11:00",
+      "equipo_local": "CE ARENYS DE MUNT B",
+      "equipo_visitante": "JESUS MARIA I JOSEP B",
+      "resultado": null,
+      "pista": "PAVELLÓ MUNICIPAL AL TORRENT D EN TERRA",
+      "club1": "232",
+      "club2": "253"
+    },
+    {
+      "categoria": "BCN BENJAMÍ OR COPA BCN 2",
+      "fecha": "30/05/2026",
+      "hora": "15:00",
+      "equipo_local": "JESUS MARIA I JOSEP B",
+      "equipo_visitante": "JOIERIA MONER CP SANT RAMON A",
+      "resultado": null,
+      "pista": "COL·LEGI JESÚS, MARIA, I JOSEP",
+      "club1": "253",
+      "club2": "289"
+    }
+  ],
+  "cachedAt": "2026-02-17T11:37:49.347Z"
+}

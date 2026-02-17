@@ -6,10 +6,9 @@ const CATEGORIA = "BENJAMÍ OR COPA BCN 2";
 import { HeroNextMatch } from "./components/HeroNextMatch";
 import { MatchCard } from "./components/MatchCard";
 import { Section } from "./components/Section";
+import { EmailSubscription } from "./components/EmailSubscription";
 import { parseFechaHora, type Partido } from "./lib/agenda";
 import { getBaseUrl } from "./lib/base-url";
-
-
 
 async function getPartidos(): Promise<{ partidos: Partido[]; cachedAt?: string }> {
   const baseUrl = await getBaseUrl();
@@ -18,7 +17,6 @@ async function getPartidos(): Promise<{ partidos: Partido[]; cachedAt?: string }
   const data = (await res.json()) as { partidos?: Partido[]; cachedAt?: string };
   return { partidos: data.partidos ?? [], cachedAt: data.cachedAt };
 }
-
 
 export default async function Home() {
   const { partidos, cachedAt } = await getPartidos();
@@ -43,7 +41,7 @@ export default async function Home() {
           <span className="text-xs text-blue-700 dark:text-blue-200">
             Última actualización: {cachedAt ? new Date(cachedAt).toLocaleString() : "-"}
           </span>
-          {/*<RefreshButton />*/}
+          <EmailSubscription />
         </div>
         <HeroNextMatch partido={proximo} />
 

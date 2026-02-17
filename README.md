@@ -16,6 +16,25 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Email notifications (Gmail)
+
+This app can notify subscribers by email when the schedule changes.
+
+1) Create a `.env.local` from [.env.local.example](.env.local.example)
+
+2) For Gmail, use an **App Password** (not your normal password):
+- Google Account → Security → 2-Step Verification → App passwords
+- Set `SMTP_USER` to your full Gmail address
+- Set `SMTP_PASS` to the generated 16-character app password
+
+3) Run the app:
+
+```bash
+pnpm dev
+```
+
+Then subscribe from the home page.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
