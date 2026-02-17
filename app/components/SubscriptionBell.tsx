@@ -76,7 +76,7 @@ export function SubscriptionBell() {
         }
       >
         <div className="rounded-2xl border border-blue-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 shadow-xl backdrop-blur p-4 transition">
-          <EmailSubscription onSuccess={() => setOpen(false)} />
+          <EmailSubscription key={open ? 'open' : 'closed'} onSuccess={() => setOpen(false)} />
         </div>
       </div>
     </div>
