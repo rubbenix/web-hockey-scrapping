@@ -2,7 +2,7 @@ name: Check Agenda
 
 on:
   schedule:
-    - cron: "0 */4 * * *"
+    - cron: "0 */4 * * *"   # Cada 4 horas (UTC)
   workflow_dispatch:
 
 jobs:
@@ -10,27 +10,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      # 1️⃣ Descargar el repositorio
+      - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2️⃣ Configurar Node 20 (necesario para Next + Cheerio moderno)
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
 
+      # 3️⃣ Instalar dependencias
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Run script
+      # 4️⃣ Ejecutar script de comprobación
+      - name: Run agenda check
         run: node checkAgenda.js
         env:
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
 
+      # 5️⃣ Hacer commit automático si el JSON cambió
       - name: Commit changes if any
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add .
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update partidos JSON"
+          git add data/partidos.json
+          git diff --cached --quiet || git commit -m "Update partidos JSON"
           git push
