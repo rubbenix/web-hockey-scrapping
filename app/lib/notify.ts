@@ -4,7 +4,7 @@ import { diffAgenda } from "@/app/lib/agenda-hash";
 import { sendEmail } from "@/app/lib/mailer";
 
 function formatPartido(p: Partido) {
-  return `${p.fecha} ${p.hora} — ${p.equipo_local} vs ${p.equipo_visitante} (${p.pista})`;
+  return `${p.fecha} ${p.hora} - ${p.equipo_local} vs ${p.equipo_visitante} (${p.pista})`;
 }
 
 function escapeHtml(input: string) {
