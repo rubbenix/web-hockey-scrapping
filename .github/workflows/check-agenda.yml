@@ -2,7 +2,7 @@ name: Check Agenda
 
 on:
   schedule:
-    - cron: "0 */4 * * *"   # Cada 4 horas (UTC)
+    - cron: "0 */4 * * *"
   workflow_dispatch:
 
 jobs:
@@ -10,29 +10,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Descargar el repositorio
+      # 1️⃣ Checkout
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Configurar Node 20 (necesario para Next + Cheerio moderno)
+      # 2️⃣ Setup Node
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: 'pnpm'
 
-      # 3️⃣ Instalar dependencias
+      # 3️⃣ Setup PNPM
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      # 4️⃣ Install dependencies
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
-      # 4️⃣ Ejecutar script de comprobación
+      # 5️⃣ Run script
       - name: Run agenda check
         run: node checkAgenda.js
         env:
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
 
-      # 5️⃣ Hacer commit automático si el JSON cambió
+      # 6️⃣ Commit JSON if changed
       - name: Commit changes if any
         run: |
           git config user.name "github-actions"
