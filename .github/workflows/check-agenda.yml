@@ -14,31 +14,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Setup Node
+      # 2️⃣ Setup Node (sin cache aún)
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
 
-      # 3️⃣ Setup PNPM
+      # 3️⃣ Instalar PNPM
       - name: Setup PNPM
         uses: pnpm/action-setup@v4
         with:
           version: 10
 
-      # 4️⃣ Install dependencies
+      # 4️⃣ Instalar dependencias
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # 5️⃣ Run script
+      # 5️⃣ Ejecutar script
       - name: Run agenda check
         run: node checkAgenda.js
         env:
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
 
-      # 6️⃣ Commit JSON if changed
+      # 6️⃣ Commit si hay cambios
       - name: Commit changes if any
         run: |
           git config user.name "github-actions"
