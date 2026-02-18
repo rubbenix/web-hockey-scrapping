@@ -1,7 +1,7 @@
-import fs from "fs";
-import nodemailer from "nodemailer";
-import fetch from "node-fetch";
-import * as cheerio from "cheerio";
+const fs = require("fs");
+const nodemailer = require("nodemailer");
+const fetch = require("node-fetch");
+const cheerio = require("cheerio");
 
 const FILE_PATH = "./data/partidos.json";
 
@@ -41,26 +41,6 @@ async function getPartidos() {
   return partidos;
 }
 
-async function main() {
-  const nuevos = await getPartidos();
-
-  const antiguos = JSON.parse(
-    fs.readFileSync(FILE_PATH, "utf8")
-  );
-
-  if (JSON.stringify(nuevos) !== JSON.stringify(antiguos)) {
-    console.log("Cambios detectados 🚨");
-
-    fs.writeFileSync(FILE_PATH, JSON.stringify(nuevos, null, 2));
-
-    await enviarEmail();
-
-    process.exit(1); // importante para que GH detecte cambio
-  }
-
-  console.log("Sin cambios");
-}
-
 async function enviarEmail() {
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -78,4 +58,31 @@ async function enviarEmail() {
   });
 }
 
-main();
+async function main() {
+  const nuevos = await getPartidos();
+
+  if (!fs.existsSync(FILE_PATH)) {
+    fs.writeFileSync(FILE_PATH, JSON.stringify(nuevos, null, 2));
+    console.log("Archivo JSON creado");
+    return;
+  }
+
+  const antiguos = JSON.parse(
+    fs.readFileSync(FILE_PATH, "utf8")
+  );
+
+  if (JSON.stringify(nuevos) !== JSON.stringify(antiguos)) {
+    console.log("Cambios detectados 🚨");
+
+    fs.writeFileSync(FILE_PATH, JSON.stringify(nuevos, null, 2));
+
+    await enviarEmail();
+  } else {
+    console.log("Sin cambios");
+  }
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
