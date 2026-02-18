@@ -45,7 +45,7 @@ export default async function Home() {
         </div>
         <HeroNextMatch partido={proximo} />
 
-        <Section title={<span className="text-sky-400">Pròxims partits</span>}>
+        <Section title="Pròxims partits">
           <div className="space-y-4">
             {futuros.length === 0 ? (
               <div className="text-blue-400">No hi ha pròxims partits.</div>
@@ -55,7 +55,7 @@ export default async function Home() {
           </div>
         </Section>
 
-        <Section title={<span className="text-sky-400">Partits jugats</span>}>
+        <Section title="Partits jugats">
           <div className="space-y-4">
             {jugados.length === 0 ? (
               <div className="text-blue-200">No hi ha partits jugats.</div>
