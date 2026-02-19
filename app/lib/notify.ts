@@ -151,6 +151,16 @@ Veure l'agenda completa →
 
   html += renderTable("Afegits", "#dcfce7", "#166534", added);
   html += renderTable("Eliminats", "#fee2e2", "#991b1b", removed);
+  html += renderTable("Modificats", "#ffedd5", "#9a3412", changed.map(c => ({
+    categoria: c.after.categoria,
+    fecha: c.after.fecha,
+    hora: c.after.hora,
+    equipo_local: c.after.equipo_local,
+    equipo_visitante: c.after.equipo_visitante,
+    resultado: c.after.resultado,
+    pista: c.after.pista,
+    // Puedes mostrar diferencias aquí si lo deseas
+  })));
 
   html += `
 <tr>
