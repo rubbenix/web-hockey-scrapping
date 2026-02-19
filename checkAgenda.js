@@ -4,9 +4,13 @@ const nodemailer = require("nodemailer");
 const fetch = require("node-fetch");
 const cheerio = require("cheerio");
 
-const FILE_PATH = "./data/partidos.json";
+const FILE_PATH = "./app/data/ben.json";
 
-// Asegurar carpeta
+const CLUB_ID = "253";
+const TEAM_NAME = "JESUS MARIA I JOSEP B";
+const CATEGORIA = "BCN BENJAMÍ OR COPA BCN 2";
+
+// Crear carpeta si no existe
 const dir = path.dirname(FILE_PATH);
 if (!fs.existsSync(dir)) {
   fs.mkdirSync(dir, { recursive: true });
@@ -27,16 +31,9 @@ async function getPartidos() {
     }
   );
 
-  if (!response.ok) {
-    throw new Error(`HTTP error: ${response.status}`);
-  }
+  if (!response.ok) throw new Error("Error HTTP en scraping");
 
   const html = await response.text();
-
-  if (!html || html.length < 100) {
-    throw new Error("HTML inválido o vacío");
-  }
-
   const $ = cheerio.load(html);
 
   const partidos = [];
@@ -45,17 +42,35 @@ async function getPartidos() {
     const tds = $(el).find("td");
     if (tds.length < 9) return;
 
-    partidos.push({
-      fecha: $(tds[1]).text().trim(),
-      hora: $(tds[2]).text().trim(),
-      local: $(tds[4]).text().trim(),
-      visitante: $(tds[6]).text().trim(),
-      resultado: $(tds[7]).text().trim(),
-    });
+    const categoria = $(tds[0]).text().trim();
+    const fecha = $(tds[1]).text().trim();
+    const hora = $(tds[2]).text().trim();
+    const equipo_local = $(tds[4]).text().trim();
+    const equipo_visitante = $(tds[6]).text().trim();
+    const resultadoRaw = $(tds[7]).text().trim();
+    const resultado = resultadoRaw.includes("-") ? resultadoRaw : null;
+    const club1 = $(el).attr("club1");
+    const club2 = $(el).attr("club2");
+
+    // 🔥 FILTRADO SOLO TU EQUIPO
+    if (
+      (club1 === CLUB_ID || club2 === CLUB_ID) &&
+      (equipo_local === TEAM_NAME || equipo_visitante === TEAM_NAME) &&
+      categoria === CATEGORIA
+    ) {
+      partidos.push({
+        categoria,
+        fecha,
+        hora,
+        equipo_local,
+        equipo_visitante,
+        resultado,
+      });
+    }
   });
 
   if (partidos.length === 0) {
-    throw new Error("No se encontraron partidos. Posible fallo de scraping.");
+    throw new Error("No se encontraron partidos del equipo");
   }
 
   return partidos;
@@ -68,26 +83,24 @@ function detectarCambios(antiguos, nuevos) {
     const antiguo = antiguos.find(
       (p) =>
         p.fecha === nuevo.fecha &&
-        p.local === nuevo.local &&
-        p.visitante === nuevo.visitante
+        p.equipo_local === nuevo.equipo_local &&
+        p.equipo_visitante === nuevo.equipo_visitante
     );
 
     if (!antiguo) {
-      cambios.push(
-        `Nuevo partido: ${nuevo.local} vs ${nuevo.visitante} (${nuevo.fecha} ${nuevo.hora})`
-      );
+      cambios.push(`Nuevo partido: ${nuevo.equipo_local} vs ${nuevo.equipo_visitante} (${nuevo.fecha} ${nuevo.hora})`);
       return;
     }
 
     if (antiguo.hora !== nuevo.hora) {
       cambios.push(
-        `Cambio de hora:\n${nuevo.local} vs ${nuevo.visitante}\nAntes: ${antiguo.hora}\nAhora: ${nuevo.hora}`
+        `Cambio de hora:\n${nuevo.equipo_local} vs ${nuevo.equipo_visitante}\nAntes: ${antiguo.hora}\nAhora: ${nuevo.hora}`
       );
     }
 
     if (antiguo.resultado !== nuevo.resultado) {
       cambios.push(
-        `Cambio de resultado:\n${nuevo.local} vs ${nuevo.visitante}\nAntes: ${antiguo.resultado}\nAhora: ${nuevo.resultado}`
+        `Cambio de resultado:\n${nuevo.equipo_local} vs ${nuevo.equipo_visitante}\nAntes: ${antiguo.resultado}\nAhora: ${nuevo.resultado}`
       );
     }
   });
@@ -107,23 +120,15 @@ async function enviarEmail(mensaje) {
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to: process.env.EMAIL_USER,
-    subject: "⚠ Cambio detectado en agenda FECAPA",
+    subject: "⚠ Cambio en partidos BENJAMÍ",
     text: mensaje,
   });
 }
 
 async function main() {
-  console.log("Comprobando agenda...");
+  console.log("Comprobando partidos del equipo...");
 
-  let nuevos;
-
-  try {
-    nuevos = await getPartidos();
-  } catch (error) {
-    console.error("Error en scraping:", error.message);
-    console.log("Abortando sin modificar JSON.");
-    process.exit(1); // Importante para que GitHub marque fallo
-  }
+  const nuevos = await getPartidos();
 
   if (!fs.existsSync(FILE_PATH)) {
     fs.writeFileSync(FILE_PATH, JSON.stringify(nuevos, null, 2));
@@ -132,7 +137,6 @@ async function main() {
   }
 
   const antiguos = JSON.parse(fs.readFileSync(FILE_PATH, "utf8"));
-
   const cambios = detectarCambios(antiguos, nuevos);
 
   if (cambios.length > 0) {
@@ -149,6 +153,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error("Error fatal:", err);
+  console.error("Error:", err);
   process.exit(1);
 });
