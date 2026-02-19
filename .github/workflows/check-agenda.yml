@@ -45,6 +45,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add data/partidos.json
-          git diff --cached --quiet || git commit -m "Update partidos JSON"
+          git add app/data/ben.json
+          git diff --cached --quiet || git commit -m "Update ben.json"
           git push
