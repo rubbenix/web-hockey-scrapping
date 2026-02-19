@@ -131,18 +131,41 @@ async function main() {
   const nuevos = await getPartidos();
 
   if (!fs.existsSync(FILE_PATH)) {
-    fs.writeFileSync(FILE_PATH, JSON.stringify(nuevos, null, 2));
+    fs.writeFileSync(
+      FILE_PATH,
+      JSON.stringify(
+        {
+          partidos: nuevos,
+          cachedAt: new Date().toISOString(),
+        },
+        null,
+        2
+      )
+    );
+
     console.log("Archivo inicial creado.");
     return;
   }
 
-  const antiguos = JSON.parse(fs.readFileSync(FILE_PATH, "utf8"));
+  const raw = JSON.parse(fs.readFileSync(FILE_PATH, "utf8"));
+  const antiguos = Array.isArray(raw) ? raw : raw.partidos || [];
   const cambios = detectarCambios(antiguos, nuevos);
 
   if (cambios.length > 0) {
     console.log("Cambios detectados 🚨");
 
-    fs.writeFileSync(FILE_PATH, JSON.stringify(nuevos, null, 2));
+    fs.writeFileSync(
+      FILE_PATH,
+      JSON.stringify(
+        {
+          partidos: nuevos,
+          cachedAt: new Date().toISOString(),
+        },
+        null,
+        2
+      )
+    );
+
 
     await enviarEmail(cambios.join("\n\n"));
 
