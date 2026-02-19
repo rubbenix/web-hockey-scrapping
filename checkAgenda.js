@@ -89,7 +89,8 @@ function escapeHtml(input) {
 }
 
 function partidoKey(p) {
-  return `${p.fecha}|${p.equipo_local}|${p.equipo_visitante}`;
+  // Identidad del partido: mismos equipos (y categoría). Si cambia fecha/hora, será "modified".
+  return `${p.categoria}|${p.equipo_local}|${p.equipo_visitante}`;
 }
 
 function formatPartidoShort(p) {
@@ -106,27 +107,27 @@ function detectarCambios(antiguos, nuevos) {
     const antiguo = antiguosMap.get(k);
 
     if (!antiguo) {
-      cambios.push({ type: "added", before: null, after: nuevo });
+      cambios.push({ type: "added", before: null, after: nuevo, changedFields: null });
       continue;
     }
 
-    if (antiguo.hora !== nuevo.hora) {
-      cambios.push({ type: "hora", before: antiguo, after: nuevo });
-    }
+    const changedFields = {
+      fecha: (antiguo.fecha ?? "") !== (nuevo.fecha ?? ""),
+      hora: (antiguo.hora ?? "") !== (nuevo.hora ?? ""),
+      resultado: (antiguo.resultado ?? null) !== (nuevo.resultado ?? null),
+      pista: Object.prototype.hasOwnProperty.call(antiguo, "pista") && (antiguo.pista ?? "") !== (nuevo.pista ?? ""),
+    };
 
-    if (antiguo.resultado !== nuevo.resultado) {
-      cambios.push({ type: "resultado", before: antiguo, after: nuevo });
-    }
-
-    if (Object.prototype.hasOwnProperty.call(antiguo, "pista") && (antiguo.pista ?? "") !== (nuevo.pista ?? "")) {
-      cambios.push({ type: "pista", before: antiguo, after: nuevo });
+    const anyChanged = Object.values(changedFields).some(Boolean);
+    if (anyChanged) {
+      cambios.push({ type: "modified", before: antiguo, after: nuevo, changedFields });
     }
   }
 
   for (const antiguo of antiguos) {
     const k = partidoKey(antiguo);
     if (!nuevosMap.has(k)) {
-      cambios.push({ type: "removed", before: antiguo, after: null });
+      cambios.push({ type: "removed", before: antiguo, after: null, changedFields: null });
     }
   }
 
@@ -137,12 +138,10 @@ function buildEmailContent({ cambios, cachedAt }) {
   const counts = {
     added: cambios.filter((c) => c.type === "added").length,
     removed: cambios.filter((c) => c.type === "removed").length,
-    hora: cambios.filter((c) => c.type === "hora").length,
-    resultado: cambios.filter((c) => c.type === "resultado").length,
-    pista: cambios.filter((c) => c.type === "pista").length,
+    modified: cambios.filter((c) => c.type === "modified").length,
   };
 
-  const subject = `📊 Agenda actualizada (+${counts.added} -${counts.removed} ⏱${counts.hora} 🏁${counts.resultado})`;
+  const subject = `📊 Agenda actualizada (+${counts.added} -${counts.removed} ~${counts.modified})`;
   const cachedAtDisplay = new Intl.DateTimeFormat("es-ES", {
     timeZone: "Europe/Madrid",
     year: "numeric",
@@ -155,7 +154,7 @@ function buildEmailContent({ cambios, cachedAt }) {
 
   const lines = [];
   lines.push(`Cambios detectados (${cachedAtDisplay}):`);
-  lines.push(`+${counts.added} añadidos, -${counts.removed} eliminados, ⏱${counts.hora} hora, 🏁${counts.resultado} resultado, 📍${counts.pista} pista.`);
+  lines.push(`+${counts.added} añadidos, -${counts.removed} eliminados, ~${counts.modified} modificados.`);
   lines.push("");
 
   for (const c of cambios) {
@@ -163,29 +162,30 @@ function buildEmailContent({ cambios, cachedAt }) {
     const partido = formatPartidoShort(p);
     if (c.type === "added") lines.push(`+ Nuevo: ${partido} (${p.fecha} ${p.hora})`);
     else if (c.type === "removed") lines.push(`- Eliminado: ${partido} (${p.fecha} ${p.hora})`);
-    else if (c.type === "hora") lines.push(`⏱ Hora: ${partido} (${p.fecha}) ${c.before.hora} → ${c.after.hora}`);
-    else if (c.type === "resultado") lines.push(`🏁 Resultado: ${partido} (${p.fecha}) ${c.before.resultado ?? "—"} → ${c.after.resultado ?? "—"}`);
-    else if (c.type === "pista") lines.push(`📍 Pista: ${partido} (${p.fecha}) ${c.before.pista ?? "—"} → ${c.after.pista ?? "—"}`);
+    else if (c.type === "modified") {
+      const parts = [];
+      if (c.changedFields?.fecha) parts.push(`fecha ${c.before.fecha} → ${c.after.fecha}`);
+      if (c.changedFields?.hora) parts.push(`hora ${c.before.hora} → ${c.after.hora}`);
+      if (c.changedFields?.resultado) parts.push(`resultado ${(c.before.resultado ?? "—")} → ${(c.after.resultado ?? "—")}`);
+      if (c.changedFields?.pista) parts.push(`pista ${(c.before.pista ?? "—")} → ${(c.after.pista ?? "—")}`);
+      lines.push(`~ Modificado: ${partido} (${parts.join(", ")})`);
+    }
   }
 
   const badge = (label, bg, fg) =>
     `<span style="display:inline-block;padding:6px 12px;border-radius:999px;background:${bg};color:${fg};font-size:12px;font-weight:800;">${escapeHtml(label)}</span>`;
-  const preheader = `Canvis detectats: +${counts.added}, -${counts.removed}, ⏱${counts.hora}, 🏁${counts.resultado}.`;
+  const preheader = `Canvis detectats: +${counts.added}, -${counts.removed}, ~${counts.modified}.`;
 
   const badgeRow = [
     badge(`+${counts.added} afegits`, "#dcfce7", "#166534"),
     badge(`-${counts.removed} eliminats`, "#fee2e2", "#991b1b"),
-    badge(`⏱${counts.hora} hora`, "#e0f2fe", "#075985"),
-    badge(`🏁${counts.resultado} resultat`, "#ede9fe", "#5b21b6"),
-    badge(`📍${counts.pista} pista`, "#ffedd5", "#9a3412"),
+    badge(`~${counts.modified} modificats`, "#ffedd5", "#9a3412"),
   ].join(" ");
 
   const typeMeta = {
     added: { label: "Afegit", bg: "#dcfce7", fg: "#166534" },
     removed: { label: "Eliminat", bg: "#fee2e2", fg: "#991b1b" },
-    hora: { label: "Hora", bg: "#e0f2fe", fg: "#075985" },
-    resultado: { label: "Resultat", bg: "#ede9fe", fg: "#5b21b6" },
-    pista: { label: "Pista", bg: "#ffedd5", fg: "#9a3412" },
+    modified: { label: "Modificat", bg: "#ffedd5", fg: "#9a3412" },
   };
 
   const rows = cambios
@@ -193,22 +193,10 @@ function buildEmailContent({ cambios, cachedAt }) {
       const p = c.after ?? c.before;
       const meta = typeMeta[c.type] ?? { label: c.type, bg: "#f3f4f6", fg: "#111827" };
       const beforeVal = c.before
-        ? c.type === "hora"
-          ? c.before.hora
-          : c.type === "resultado"
-            ? c.before.resultado ?? "—"
-            : c.type === "pista"
-              ? c.before.pista ?? "—"
-              : "—"
+        ? `Fecha: ${c.before.fecha}\nHora: ${c.before.hora}\nResultado: ${c.before.resultado ?? "—"}\nPista: ${c.before.pista ?? "—"}`
         : "—";
       const afterVal = c.after
-        ? c.type === "hora"
-          ? c.after.hora
-          : c.type === "resultado"
-            ? c.after.resultado ?? "—"
-            : c.type === "pista"
-              ? c.after.pista ?? "—"
-              : "—"
+        ? `Fecha: ${c.after.fecha}\nHora: ${c.after.hora}\nResultado: ${c.after.resultado ?? "—"}\nPista: ${c.after.pista ?? "—"}`
         : "—";
       const pill = `<span style="display:inline-block;padding:4px 10px;border-radius:999px;background:${meta.bg};color:${meta.fg};font-size:12px;font-weight:800;">${escapeHtml(meta.label)}</span>`;
       return `
@@ -216,8 +204,8 @@ function buildEmailContent({ cambios, cachedAt }) {
         <td style="padding:12px;border-bottom:1px solid #f1f5f9;vertical-align:top;">${pill}</td>
         <td style="padding:12px;border-bottom:1px solid #f1f5f9;color:#374151;vertical-align:top;white-space:nowrap;">${escapeHtml(p.fecha)}<br/><span style="color:#6b7280;font-size:12px;">${escapeHtml(p.hora ?? "")}</span></td>
         <td style="padding:12px;border-bottom:1px solid #f1f5f9;font-weight:800;color:#111827;vertical-align:top;">${escapeHtml(formatPartidoShort(p))}</td>
-        <td style="padding:12px;border-bottom:1px solid #f1f5f9;color:#6b7280;vertical-align:top;">${escapeHtml(beforeVal)}</td>
-        <td style="padding:12px;border-bottom:1px solid #f1f5f9;color:#111827;vertical-align:top;">${escapeHtml(afterVal)}</td>
+        <td style="padding:12px;border-bottom:1px solid #f1f5f9;color:#6b7280;vertical-align:top;white-space:pre-line;">${escapeHtml(beforeVal)}</td>
+        <td style="padding:12px;border-bottom:1px solid #f1f5f9;color:#111827;vertical-align:top;white-space:pre-line;">${escapeHtml(afterVal)}</td>
         <td style="padding:12px;border-bottom:1px solid #f1f5f9;color:#6b7280;vertical-align:top;">${escapeHtml(p.pista ?? "—")}</td>
       </tr>`;
     })
