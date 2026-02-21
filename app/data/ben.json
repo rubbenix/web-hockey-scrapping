@@ -48,7 +48,7 @@
     {
       "categoria": "BCN BENJAMÍ OR COPA BCN 2",
       "fecha": "21/03/2026",
-      "hora": "10:00",
+      "hora": "11:15",
       "equipo_local": "JOIERIA MONER CP SANT RAMON A",
       "equipo_visitante": "JESUS MARIA I JOSEP B",
       "resultado": null,
@@ -109,5 +109,5 @@
       "pista": "COL·LEGI JESÚS, MARIA, I JOSEP"
     }
   ],
-  "cachedAt": "2026-02-20T00:01:05.560Z"
+  "cachedAt": "2026-02-21T08:40:10.308Z"
 }
