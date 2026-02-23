@@ -39,6 +39,9 @@ jobs:
         env:
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          GS_CLIENT_EMAIL: ${{ secrets.GS_CLIENT_EMAIL }}
+          GS_PRIVATE_KEY: ${{ secrets.GS_PRIVATE_KEY }}
+          GS_SPREADSHEET_ID: ${{ secrets.GS_SPREADSHEET_ID }}
 
       # 6️⃣ Commit si hay cambios
       - name: Commit changes if any
