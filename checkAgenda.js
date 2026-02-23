@@ -1,20 +1,24 @@
-const fs = require("fs");
+const dotenv = require('dotenv');
+if (require('fs').existsSync('.env.local')) {
+  dotenv.config({ path: '.env.local' });
+} else {
+  dotenv.config();
+}
+const fs = require("fs"); // Only for mkdir, not for reading/writing partidos
 const path = require("path");
 const nodemailer = require("nodemailer");
 const fetch = require("node-fetch");
 const cheerio = require("cheerio");
 
-const FILE_PATH = "./app/data/ben.json";
+const { readMatchesFromSheet, writeMatchesToSheet } = require("./app/lib/gsheet-matches");
+
+// const FILE_PATH = "./app/data/ben.json"; // No longer used
 
 const CLUB_ID = "253";
 const TEAM_NAME = "JESUS MARIA I JOSEP B";
 const CATEGORIA = "BCN BENJAMÍ OR COPA BCN 2";
 
-// Crear carpeta si no existe
-const dir = path.dirname(FILE_PATH);
-if (!fs.existsSync(dir)) {
-  fs.mkdirSync(dir, { recursive: true });
-}
+// No need to create local data dir
 
 async function getPartidos() {
   const response = await fetch(
@@ -294,46 +298,27 @@ async function main() {
 
   const nuevos = await getPartidos();
 
-  if (!fs.existsSync(FILE_PATH)) {
-    fs.writeFileSync(
-      FILE_PATH,
-      JSON.stringify(
-        {
-          partidos: nuevos,
-          cachedAt: new Date().toISOString(),
-        },
-        null,
-        2
-      )
-    );
+  // Leer partidos antiguos desde Google Sheets
+  let antiguos = [];
+  try {
+    antiguos = await readMatchesFromSheet();
+  } catch (e) {
+    console.error("Error leyendo partidos desde Google Sheets:", e);
+  }
+  const cambios = detectarCambios(antiguos, nuevos);
 
-    console.log("Archivo inicial creado.");
+  if (antiguos.length === 0) {
+    // Primera vez: guardar y salir
+    await writeMatchesToSheet(nuevos);
+    console.log("Hoja inicial creada en Google Sheets.");
     return;
   }
 
-  const raw = JSON.parse(fs.readFileSync(FILE_PATH, "utf8"));
-  const antiguos = Array.isArray(raw) ? raw : raw.partidos || [];
-  const cambios = detectarCambios(antiguos, nuevos);
-
   if (cambios.length > 0) {
     console.log("Cambios detectados 🚨");
-
-    fs.writeFileSync(
-      FILE_PATH,
-      JSON.stringify(
-        {
-          partidos: nuevos,
-          cachedAt: new Date().toISOString(),
-        },
-        null,
-        2
-      )
-    );
-
-
+    await writeMatchesToSheet(nuevos);
     const content = buildEmailContent({ cambios, cachedAt: new Date().toISOString() });
     await enviarEmail(content);
-
     console.log("Email enviado.");
   } else {
     console.log("Sin cambios.");
