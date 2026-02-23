@@ -71,6 +71,8 @@ async function getPartidos() {
         equipo_visitante,
         resultado,
         pista,
+        club1,
+        club2,
       });
     }
   });
@@ -316,6 +318,14 @@ async function main() {
   } catch (e) {
     console.error("Error leyendo partidos desde Google Sheets:", e);
   }
+
+  // Si la hoja antigua no tenía club1/club2, la reescribimos (sin enviar email)
+  const needsSheetUpgrade =
+    Array.isArray(antiguos) &&
+    antiguos.length > 0 &&
+    antiguos.some((p) => !p.club1 && !p.club2) &&
+    nuevos.some((p) => p.club1 || p.club2);
+
   const cambios = detectarCambios(antiguos, nuevos);
 
   if (antiguos.length === 0) {
@@ -332,7 +342,12 @@ async function main() {
     await enviarEmail(content);
     console.log("Email enviado.");
   } else {
-    console.log("Sin cambios.");
+    if (needsSheetUpgrade) {
+      await writeMatchesToSheet(nuevos);
+      console.log("Hoja actualizada (upgrade club1/club2).");
+    } else {
+      console.log("Sin cambios.");
+    }
   }
 }
 

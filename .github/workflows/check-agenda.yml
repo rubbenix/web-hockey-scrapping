@@ -42,12 +42,3 @@ jobs:
           GS_CLIENT_EMAIL: ${{ secrets.GS_CLIENT_EMAIL }}
           GS_PRIVATE_KEY: ${{ secrets.GS_PRIVATE_KEY }}
           GS_SPREADSHEET_ID: ${{ secrets.GS_SPREADSHEET_ID }}
-
-      # 6️⃣ Commit si hay cambios
-      - name: Commit changes if any
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add app/data/ben.json
-          git diff --cached --quiet || git commit -m "Update ben.json"
-          git push

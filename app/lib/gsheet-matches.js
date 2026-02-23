@@ -12,6 +12,8 @@ const MATCH_FIELDS = [
   'equipo_visitante',
   'resultado',
   'pista',
+  'club1',
+  'club2',
 ];
 
 function asTrimmedString(value) {
@@ -35,6 +37,8 @@ function normalizeMatchFromSheetRow(raw) {
     equipo_visitante: asTrimmedString(raw.equipo_visitante),
     resultado: normalizeResultado(raw.resultado),
     pista: asTrimmedString(raw.pista),
+    club1: asTrimmedString(raw.club1),
+    club2: asTrimmedString(raw.club2),
   };
 
   const hasAny = Object.entries(match).some(([k, v]) => (k === 'resultado' ? v != null : Boolean(v)));

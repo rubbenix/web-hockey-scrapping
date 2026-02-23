@@ -60,7 +60,7 @@ export function SubscriptionBell() {
         className="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-blue-900 bg-slate-900 text-sky-400 hover:bg-slate-800 disabled:opacity-60 transition"
       >
         <BellIcon className="h-5 w-5" />
-        <span className="sr-only">Avisa'm per email</span>
+        <span className="sr-only">Avisa&apos;m per email</span>
       </button>
 
       <div

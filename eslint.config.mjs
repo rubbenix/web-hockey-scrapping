@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+
+    // Node scripts / utilities (not part of Next.js bundle)
+    "checkAgenda.js",
+    "app/lib/gsheet-matches.js",
   ]),
 ]);
 
