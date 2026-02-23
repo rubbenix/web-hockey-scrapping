@@ -23,9 +23,12 @@ function clubLogoSrc(clubId?: string) {
   // Logos disponibles actualmente en /public
   // (si añades más, amplía aquí o usa un patrón de nombres consistente)
   const map: Record<string, string> = {
+    "232": "/232_1.webp",
     "253": "/253.webp",
+    "251": "/251_1.webp",
     "246": "/246_1.webp",
     "288": "/288_1.webp",
+    "289": "/289.webp",
     "612": "/612_1.webp",
   };
   return map[clubId] ?? null;
