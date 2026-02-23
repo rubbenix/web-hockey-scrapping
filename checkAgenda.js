@@ -276,17 +276,28 @@ function buildEmailContent({ cambios, cachedAt }) {
 }
 
 async function enviarEmail({ subject, text, html }) {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+  const user = process.env.EMAIL_USER || process.env.SMTP_USER;
+  const pass = process.env.EMAIL_PASS || process.env.SMTP_PASS;
+  if (!user || !pass) {
+    throw new Error("Faltan credenciales SMTP (EMAIL_USER/EMAIL_PASS o SMTP_USER/SMTP_PASS)");
+  }
+
+  const hasHost = Boolean(process.env.SMTP_HOST);
+  const transporter = hasHost
+    ? nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 465,
+        secure: (process.env.SMTP_SECURE ?? "true") === "true",
+        auth: { user, pass },
+      })
+    : nodemailer.createTransport({
+        service: "gmail",
+        auth: { user, pass },
+      });
 
   await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: process.env.EMAIL_USER,
+    from: process.env.EMAIL_FROM || user,
+    to: process.env.EMAIL_TO || user,
     subject,
     text,
     html,
