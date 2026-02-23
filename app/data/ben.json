@@ -24,13 +24,13 @@
       "hora": "11:00",
       "equipo_local": "JESUS MARIA I JOSEP B",
       "equipo_visitante": "CP MONTESQUIU A",
-      "resultado": null,
+      "resultado": "5 - 4",
       "pista": "COL·LEGI JESÚS, MARIA, I JOSEP"
     },
     {
       "categoria": "BCN BENJAMÍ OR COPA BCN 2",
       "fecha": "28/02/2026",
-      "hora": "15:00",
+      "hora": "16:15",
       "equipo_local": "UNIÓ ESPORTIVA D'HORTA A",
       "equipo_visitante": "JESUS MARIA I JOSEP B",
       "resultado": null,
@@ -109,5 +109,5 @@
       "pista": "COL·LEGI JESÚS, MARIA, I JOSEP"
     }
   ],
-  "cachedAt": "2026-02-21T08:40:10.308Z"
+  "cachedAt": "2026-02-23T08:59:17.913Z"
 }
