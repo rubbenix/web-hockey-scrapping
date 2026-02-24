@@ -166,15 +166,13 @@ function buildEmailContent({ cambios, cachedAt }) {
   for (const c of cambios) {
     const p = c.after ?? c.before;
     const partido = formatPartidoShort(p);
-    if (c.type === "added") lines.push(`+ Nuevo: ${partido} (${p.fecha} ${p.hora})`);
-    else if (c.type === "removed") lines.push(`- Eliminado: ${partido} (${p.fecha} ${p.hora})`);
+    if (c.type === "added") lines.push(`+ Nuevo: ${partido}`);
+    else if (c.type === "removed") lines.push(`- Eliminado: ${partido}`);
     else if (c.type === "modified") {
       const parts = [];
-      if (c.changedFields?.fecha) parts.push(`fecha ${c.before.fecha} → ${c.after.fecha}`);
-      if (c.changedFields?.hora) parts.push(`hora ${c.before.hora} → ${c.after.hora}`);
       if (c.changedFields?.resultado) parts.push(`resultado ${(c.before.resultado ?? "—")} → ${(c.after.resultado ?? "—")}`);
-      if (c.changedFields?.pista) parts.push(`pista ${(c.before.pista ?? "—")} → ${(c.after.pista ?? "—")}`);
-      lines.push(`~ Modificado: ${partido} (${parts.join(", ")})`);
+      const detail = parts.length ? ` (${parts.join(", ")})` : "";
+      lines.push(`~ Modificado: ${partido}${detail}`);
     }
   }
 
