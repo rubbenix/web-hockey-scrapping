@@ -252,7 +252,7 @@ function buildEmailContent({ cambios, cachedAt }) {
                   </table>
                 </div>
                 <div style="margin-top:18px;">
-                  <a href="${escapeHtml("https://www.hoqueipatins.fecapa.cat/")}" style="display:inline-block;padding:12px 16px;border-radius:12px;background:#0b4ea2;color:#ffffff;text-decoration:none;font-weight:800;font-size:14px;box-shadow:0 4px 14px rgba(11,78,162,0.3);">Veure l'agenda →</a>
+                  <a href="${escapeHtml("https://hockey-jet.vercel.app/")}" style="display:inline-block;padding:12px 16px;border-radius:12px;background:#0b4ea2;color:#ffffff;text-decoration:none;font-weight:800;font-size:14px;box-shadow:0 4px 14px rgba(11,78,162,0.3);">Veure l'agenda →</a>
                 </div>
               </td>
             </tr>
