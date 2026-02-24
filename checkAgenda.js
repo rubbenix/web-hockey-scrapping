@@ -178,7 +178,7 @@ function buildEmailContent({ cambios, cachedAt }) {
 
   const badge = (label, bg, fg) =>
     `<span style="display:inline-block;padding:6px 12px;border-radius:999px;background:${bg};color:${fg};font-size:12px;font-weight:800;">${escapeHtml(label)}</span>`;
-  const preheader = `Canvis detectats: +${counts.added}, -${counts.removed}, ~${counts.modified}.`;
+  const preheader = `Canvis detectats (sense data ni pista): +${counts.added}, -${counts.removed}, ~${counts.modified}.`;
 
   const badgeRow = [
     badge(`+${counts.added} afegits`, "#dcfce7", "#166534"),
