@@ -258,12 +258,9 @@ function buildEmailContent({ cambios, cachedAt }) {
                 <div style="margin-top:18px;">
                   <a href="${escapeHtml("https://www.hoqueipatins.fecapa.cat/")}" style="display:inline-block;padding:12px 16px;border-radius:12px;background:#0b4ea2;color:#ffffff;text-decoration:none;font-weight:800;font-size:14px;box-shadow:0 4px 14px rgba(11,78,162,0.3);">Veure l'agenda →</a>
                 </div>
-              <tr>
-                <td style="padding:12px;border-bottom:1px solid #f1f5f9;vertical-align:top;">${pill}</td>
-                <td style="padding:12px;border-bottom:1px solid #f1f5f9;font-weight:800;color:#111827;vertical-align:top;">${escapeHtml(formatPartidoShort(p))}</td>
-                <td style="padding:12px;border-bottom:1px solid #f1f5f9;color:#6b7280;vertical-align:top;white-space:pre-line;">${escapeHtml(beforeVal)}</td>
-                <td style="padding:12px;border-bottom:1px solid #f1f5f9;color:#111827;vertical-align:top;white-space:pre-line;">${escapeHtml(afterVal)}</td>
-              </tr>`;
+              </td>
+            </tr>
+          </table>
         </td>
       </tr>
     </table>
