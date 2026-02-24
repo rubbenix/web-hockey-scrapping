@@ -206,11 +206,9 @@ function buildEmailContent({ cambios, cachedAt }) {
       return `
       <tr>
         <td style="padding:12px;border-bottom:1px solid #f1f5f9;vertical-align:top;">${pill}</td>
-        <td style="padding:12px;border-bottom:1px solid #f1f5f9;color:#374151;vertical-align:top;white-space:nowrap;">${escapeHtml(p.fecha)}<br/><span style="color:#6b7280;font-size:12px;">${escapeHtml(p.hora ?? "")}</span></td>
         <td style="padding:12px;border-bottom:1px solid #f1f5f9;font-weight:800;color:#111827;vertical-align:top;">${escapeHtml(formatPartidoShort(p))}</td>
         <td style="padding:12px;border-bottom:1px solid #f1f5f9;color:#6b7280;vertical-align:top;white-space:pre-line;">${escapeHtml(beforeVal)}</td>
         <td style="padding:12px;border-bottom:1px solid #f1f5f9;color:#111827;vertical-align:top;white-space:pre-line;">${escapeHtml(afterVal)}</td>
-        <td style="padding:12px;border-bottom:1px solid #f1f5f9;color:#6b7280;vertical-align:top;">${escapeHtml(p.pista ?? "—")}</td>
       </tr>`;
     })
     .join("");
