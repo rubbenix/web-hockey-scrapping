@@ -248,11 +248,9 @@ function buildEmailContent({ cambios, cachedAt }) {
                   <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
                     <tr style="background:#f8fafc;">
                       <th align="left" style="padding:12px;font-size:12px;color:#6b7280;">Tipus</th>
-                      <th align="left" style="padding:12px;font-size:12px;color:#6b7280;">Data</th>
                       <th align="left" style="padding:12px;font-size:12px;color:#6b7280;">Partit</th>
                       <th align="left" style="padding:12px;font-size:12px;color:#6b7280;">Abans</th>
                       <th align="left" style="padding:12px;font-size:12px;color:#6b7280;">Ara</th>
-                      <th align="left" style="padding:12px;font-size:12px;color:#6b7280;">Pista</th>
                     </tr>
                     ${rows}
                   </table>
@@ -260,14 +258,12 @@ function buildEmailContent({ cambios, cachedAt }) {
                 <div style="margin-top:18px;">
                   <a href="${escapeHtml("https://www.hoqueipatins.fecapa.cat/")}" style="display:inline-block;padding:12px 16px;border-radius:12px;background:#0b4ea2;color:#ffffff;text-decoration:none;font-weight:800;font-size:14px;box-shadow:0 4px 14px rgba(11,78,162,0.3);">Veure l'agenda →</a>
                 </div>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:20px 28px;background:#f8fafc;border-top:1px solid #e5e7eb;font-size:12px;color:#6b7280;text-align:center;">
-                Reps aquest correu perquè tens configurat l'avís de canvis de l'agenda.
-              </td>
-            </tr>
-          </table>
+              <tr>
+                <td style="padding:12px;border-bottom:1px solid #f1f5f9;vertical-align:top;">${pill}</td>
+                <td style="padding:12px;border-bottom:1px solid #f1f5f9;font-weight:800;color:#111827;vertical-align:top;">${escapeHtml(formatPartidoShort(p))}</td>
+                <td style="padding:12px;border-bottom:1px solid #f1f5f9;color:#6b7280;vertical-align:top;white-space:pre-line;">${escapeHtml(beforeVal)}</td>
+                <td style="padding:12px;border-bottom:1px solid #f1f5f9;color:#111827;vertical-align:top;white-space:pre-line;">${escapeHtml(afterVal)}</td>
+              </tr>`;
         </td>
       </tr>
     </table>
