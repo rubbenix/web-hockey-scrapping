@@ -10,7 +10,7 @@ const nodemailer = require("nodemailer");
 const fetch = require("node-fetch");
 const cheerio = require("cheerio");
 
-const { readMatchesFromSheet, writeMatchesToSheet } = require("./app/lib/gsheet-matches");
+const { readMatchesFromSheet, writeMatchesToSheet, writeMetaTimestamp } = require("./app/lib/gsheet-matches");
 
 // const FILE_PATH = "./app/data/ben.json"; // No longer used
 
@@ -320,6 +320,11 @@ async function main() {
   if (antiguos.length === 0) {
     // Primera vez: guardar y salir
     await writeMatchesToSheet(nuevos);
+    try {
+      await writeMetaTimestamp(new Date().toISOString());
+    } catch (e) {
+      console.error("No se pudo escribir meta timestamp:", e);
+    }
     console.log("Hoja inicial creada en Google Sheets.");
     return;
   }
@@ -329,12 +334,27 @@ async function main() {
     await writeMatchesToSheet(nuevos);
     const content = buildEmailContent({ cambios, cachedAt: new Date().toISOString() });
     await enviarEmail(content);
+    try {
+      await writeMetaTimestamp(new Date().toISOString());
+    } catch (e) {
+      console.error("No se pudo escribir meta timestamp:", e);
+    }
     console.log("Email enviado.");
   } else {
     if (needsSheetUpgrade) {
       await writeMatchesToSheet(nuevos);
+      try {
+        await writeMetaTimestamp(new Date().toISOString());
+      } catch (e) {
+        console.error("No se pudo escribir meta timestamp:", e);
+      }
       console.log("Hoja actualizada (upgrade club1/club2).");
     } else {
+      try {
+        await writeMetaTimestamp(new Date().toISOString());
+      } catch (e) {
+        console.error("No se pudo escribir meta timestamp:", e);
+      }
       console.log("Sin cambios.");
     }
   }

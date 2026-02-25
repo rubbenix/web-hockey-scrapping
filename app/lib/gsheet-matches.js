@@ -113,3 +113,15 @@ async function writeMatchesToSheet(matches) {
 }
 
 module.exports = { readMatchesFromSheet, writeMatchesToSheet };
+
+async function writeMetaTimestamp(timestampIso) {
+  const { sheets, spreadsheetId } = await getGoogleSheetsClient();
+  await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: `meta!A1`,
+    valueInputOption: 'RAW',
+    requestBody: { values: [[timestampIso]] },
+  });
+}
+
+module.exports = { readMatchesFromSheet, writeMatchesToSheet, writeMetaTimestamp };

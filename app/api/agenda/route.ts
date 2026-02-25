@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readPartidosFromSheet } from "@/app/lib/gsheet-partidos";
+import { getCachedPartidos } from "@/app/lib/agenda-cache";
 
 export const runtime = "nodejs";
 // La persistencia de la agenda vive en Google Sheets (hoja "partidos")
@@ -23,10 +23,9 @@ function getErrorMessage(err: unknown) {
 
 export async function GET(request: Request) {
   try {
-    const partidos = await readPartidosFromSheet();
-    // Nota: no tenemos una fuente de "cachedAt" persistida en la hoja (todavía).
-    // Devolvemos la hora de lectura para que la UI muestre una referencia.
-    return NextResponse.json({ partidos, cachedAt: new Date().toISOString() });
+    const { partidos, cachedAt } = await getCachedPartidos();
+    // Devolvemos la hora de lectura o la de la cache para que la UI muestre una referencia.
+    return NextResponse.json({ partidos, cachedAt });
   } catch (e: unknown) {
     return NextResponse.json({ error: getErrorMessage(e) }, { status: 500 });
   }

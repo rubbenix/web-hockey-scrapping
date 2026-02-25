@@ -8,13 +8,11 @@ import { MatchCard } from "./components/MatchCard";
 import { Section } from "./components/Section";
 import { SubscriptionBell } from "./components/SubscriptionBell";
 import { parseFechaHora, type Partido } from "./lib/agenda";
-import { getBaseUrl } from "./lib/base-url";
+import { getCachedPartidos } from "./lib/agenda-cache";
 
 async function getPartidos(): Promise<{ partidos: Partido[]; cachedAt?: string }> {
-  const baseUrl = await getBaseUrl();
-  const res = await fetch(`${baseUrl}/api/agenda`);
-  if (!res.ok) throw new Error("No se pudo cargar la agenda");
-  const data = (await res.json()) as { partidos?: Partido[]; cachedAt?: string };
+  // Leer directamente desde el reader/caché en servidor para evitar la llamada HTTP interna
+  const data = await getCachedPartidos();
   return { partidos: data.partidos ?? [], cachedAt: data.cachedAt };
 }
 

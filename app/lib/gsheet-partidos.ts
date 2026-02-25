@@ -77,7 +77,7 @@ function getSheetsClient() {
   return { sheets, spreadsheetId };
 }
 
-export async function readPartidosFromSheet(): Promise<Partido[]> {
+export async function readPartidosFromSheet(): Promise<{ partidos: Partido[]; cachedAt?: string }> {
   const { sheets, spreadsheetId } = getSheetsClient();
 
   const res = await sheets.spreadsheets.values.get({
@@ -86,7 +86,7 @@ export async function readPartidosFromSheet(): Promise<Partido[]> {
   });
 
   const values = res.data.values ?? [];
-  if (values.length < 2) return [];
+  if (values.length < 2) return { partidos: [] };
 
   const headers = values[0].map((h) => asTrimmedString(h));
   const rows = values.slice(1);
@@ -108,5 +108,18 @@ export async function readPartidosFromSheet(): Promise<Partido[]> {
     if (p) partidos.push(p);
   }
 
-  return partidos;
+  // Intentar leer una marca de tiempo en la hoja `meta` (celda A1) con la última comprobación.
+  let cachedAt: string | undefined;
+  try {
+    const metaRes = await sheets.spreadsheets.values.get({ spreadsheetId, range: `meta!A1` });
+    const metaVals = metaRes.data.values ?? [];
+    if (metaVals.length && metaVals[0].length) {
+      const v = asTrimmedString(metaVals[0][0]);
+      if (v) cachedAt = v;
+    }
+  } catch {
+    // no pasa nada si no existe la hoja `meta`
+  }
+
+  return { partidos, cachedAt };
 }

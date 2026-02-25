@@ -2,7 +2,7 @@ name: Check Agenda
 
 on:
   schedule:
-    - cron: "0 */4 * * *"
+    - cron: "0 */3 * * *"
   workflow_dispatch:
 
 permissions:
@@ -22,6 +22,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'pnpm'
 
       # 3️⃣ Instalar PNPM
       - name: Setup PNPM
