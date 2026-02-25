@@ -275,17 +275,20 @@ async function enviarEmail({ subject, text, html }) {
   }
 
   const hasHost = Boolean(process.env.SMTP_HOST);
+  const poolOptions = { pool: true, maxConnections: Number(process.env.SMTP_MAX_CONNECTIONS) || 3, maxMessages: Number(process.env.SMTP_MAX_MESSAGES) || 100 };
   const transporter = hasHost
-    ? nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 465,
-        secure: (process.env.SMTP_SECURE ?? "true") === "true",
-        auth: { user, pass },
-      })
-    : nodemailer.createTransport({
-        service: "gmail",
-        auth: { user, pass },
-      });
+    ? nodemailer.createTransport(
+        Object.assign(
+          {
+            host: process.env.SMTP_HOST,
+            port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 465,
+            secure: (process.env.SMTP_SECURE ?? "true") === "true",
+            auth: { user, pass },
+          },
+          poolOptions
+        )
+      )
+    : nodemailer.createTransport(Object.assign({ service: "gmail", auth: { user, pass } }, poolOptions));
 
   await transporter.sendMail({
     from: process.env.EMAIL_FROM || user,
@@ -318,14 +321,35 @@ async function enviarEmailIndividuales({ subject, text, html }, recipients) {
 
   const results = { sent: [], failed: [] };
   const delayMs = Number(process.env.EMAIL_SEND_DELAY_MS) || 10000;
+  const crypto = require('crypto');
+  const siteBase = process.env.SITE_BASE || 'https://hockey-jet.vercel.app';
+  const secret = process.env.SUBSCRIPTION_SECRET || null;
   for (const to of recipients) {
     try {
+      // Build unsubscribe token/link when possible and mailto fallback
+      const replyTo = process.env.EMAIL_REPLY_TO || process.env.EMAIL_FROM || user;
+      const mailtoUnsub = `<mailto:${process.env.EMAIL_FROM || user}?subject=Unsubscribe>`;
+      let listUnsub = mailtoUnsub;
+      if (secret) {
+        try {
+          const h = crypto.createHmac('sha256', secret).update((to || '').trim().toLowerCase()).digest('hex');
+          const url = `${siteBase}/api/subscriptions?email=${encodeURIComponent(to)}&token=${h}`;
+          listUnsub = `<${url}>, ${mailtoUnsub}`;
+        } catch (e) {
+          // ignore token generation errors
+        }
+      }
+
+      const headers = { 'List-Unsubscribe': listUnsub };
+
       await transporter.sendMail({
         from: process.env.EMAIL_FROM || user,
         to,
+        replyTo,
         subject,
         text,
         html,
+        headers,
       });
       results.sent.push(to);
       console.log(`Email enviado a ${to}`);
@@ -355,12 +379,17 @@ async function readSubscribersFromSheet() {
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
     const sheets = google.sheets({ version: 'v4', auth });
-    const res = await sheets.spreadsheets.values.get({ spreadsheetId, range: 'emails!A2:A' });
+    // Leer toda la columna A (incluye A1 por si no hay cabecera)
+    const res = await sheets.spreadsheets.values.get({ spreadsheetId, range: 'emails!A:A' });
     const rows = res.data.values || [];
     const emails = rows
       .map((r) => (r[0] || '').toString().trim().toLowerCase())
       .filter((e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
-    return Array.from(new Set(emails));
+    const uniq = Array.from(new Set(emails));
+    console.log(`Suscriptores leídos desde Sheets: ${uniq.length}`);
+    // Mostrar los primeros 10 para debugging (mask parcial)
+    console.log(uniq.slice(0, 10).map((e) => e.replace(/(.{2}).+(@.+)/, '$1***$2')));
+    return uniq;
   } catch (e) {
     console.error('Error leyendo suscriptores desde Sheets:', e);
     return [];
