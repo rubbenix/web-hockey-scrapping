@@ -296,6 +296,50 @@ async function enviarEmail({ subject, text, html }) {
   });
 }
 
+async function enviarEmailIndividuales({ subject, text, html }, recipients) {
+  const user = process.env.EMAIL_USER || process.env.SMTP_USER;
+  const pass = process.env.EMAIL_PASS || process.env.SMTP_PASS;
+  if (!user || !pass) {
+    throw new Error("Faltan credenciales SMTP (EMAIL_USER/EMAIL_PASS o SMTP_USER/SMTP_PASS)");
+  }
+
+  const hasHost = Boolean(process.env.SMTP_HOST);
+  const transporter = hasHost
+    ? nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 465,
+        secure: (process.env.SMTP_SECURE ?? "true") === "true",
+        auth: { user, pass },
+      })
+    : nodemailer.createTransport({
+        service: "gmail",
+        auth: { user, pass },
+      });
+
+  const results = { sent: [], failed: [] };
+  const delayMs = Number(process.env.EMAIL_SEND_DELAY_MS) || 10000;
+  for (const to of recipients) {
+    try {
+      await transporter.sendMail({
+        from: process.env.EMAIL_FROM || user,
+        to,
+        subject,
+        text,
+        html,
+      });
+      results.sent.push(to);
+      console.log(`Email enviado a ${to}`);
+    } catch (err) {
+      results.failed.push({ to, error: err?.message ?? String(err) });
+      console.error(`Error enviando a ${to}:`, err);
+    }
+    try {
+      await new Promise((r) => setTimeout(r, delayMs));
+    } catch {}
+  }
+  return results;
+}
+
 async function readSubscribersFromSheet() {
   const client_email = process.env.GS_CLIENT_EMAIL;
   const private_key = process.env.GS_PRIVATE_KEY?.replace(/\\n/g, '\n');
@@ -364,14 +408,21 @@ async function main() {
     try {
       const subs = await readSubscribersFromSheet();
       if (Array.isArray(subs) && subs.length > 0) {
-        process.env.EMAIL_TO = subs.join(",");
+        // Enviar individualmente a cada suscriptor
+        const res = await enviarEmailIndividuales(content, subs);
+        console.log(`Emails enviados: ${res.sent.length}, fallidos: ${res.failed.length}`);
       } else {
         console.log('No hay suscriptores en la hoja, se usará el EMAIL_USER/EMAIL_TO por defecto');
+        await enviarEmail(content);
       }
     } catch (e) {
-      console.error('Error al obtener suscriptores, se usará el destinatario por defecto:', e);
+      console.error('Error al obtener suscriptores o enviar emails, intentando envío por defecto:', e);
+      try {
+        await enviarEmail(content);
+      } catch (err) {
+        console.error('Error enviando email por defecto:', err);
+      }
     }
-    await enviarEmail(content);
     try {
       await writeMetaTimestamp(new Date().toISOString());
     } catch (e) {
