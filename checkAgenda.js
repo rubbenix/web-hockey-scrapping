@@ -7,6 +7,7 @@ if (require('fs').existsSync('.env.local')) {
 const fs = require("fs"); // Only for mkdir, not for reading/writing partidos
 const path = require("path");
 const nodemailer = require("nodemailer");
+const { google } = require('googleapis');
 const fetch = require("node-fetch");
 const cheerio = require("cheerio");
 
@@ -295,6 +296,33 @@ async function enviarEmail({ subject, text, html }) {
   });
 }
 
+async function readSubscribersFromSheet() {
+  const client_email = process.env.GS_CLIENT_EMAIL;
+  const private_key = process.env.GS_PRIVATE_KEY?.replace(/\\n/g, '\n');
+  const spreadsheetId = process.env.GS_SPREADSHEET_ID;
+  if (!client_email || !private_key || !spreadsheetId) {
+    console.warn('Faltan credenciales de Google Sheets para leer suscriptores');
+    return [];
+  }
+  try {
+    const auth = new google.auth.JWT({
+      email: client_email,
+      key: private_key,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+    const sheets = google.sheets({ version: 'v4', auth });
+    const res = await sheets.spreadsheets.values.get({ spreadsheetId, range: 'emails!A2:A' });
+    const rows = res.data.values || [];
+    const emails = rows
+      .map((r) => (r[0] || '').toString().trim().toLowerCase())
+      .filter((e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+    return Array.from(new Set(emails));
+  } catch (e) {
+    console.error('Error leyendo suscriptores desde Sheets:', e);
+    return [];
+  }
+}
+
 async function main() {
   console.log("Comprobando partidos del equipo...");
 
@@ -333,6 +361,16 @@ async function main() {
     console.log("Cambios detectados 🚨");
     await writeMatchesToSheet(nuevos);
     const content = buildEmailContent({ cambios, cachedAt: new Date().toISOString() });
+    try {
+      const subs = await readSubscribersFromSheet();
+      if (Array.isArray(subs) && subs.length > 0) {
+        process.env.EMAIL_TO = subs.join(",");
+      } else {
+        console.log('No hay suscriptores en la hoja, se usará el EMAIL_USER/EMAIL_TO por defecto');
+      }
+    } catch (e) {
+      console.error('Error al obtener suscriptores, se usará el destinatario por defecto:', e);
+    }
     await enviarEmail(content);
     try {
       await writeMetaTimestamp(new Date().toISOString());
