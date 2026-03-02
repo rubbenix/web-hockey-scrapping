@@ -432,16 +432,10 @@ async function main() {
 
   if (cambios.length > 0) {
     console.log("Cambios detectados 🚨");
-    // Detectar si los únicos cambios son en el resultado (no fecha/hora/pista/added/removed)
-    const onlyResultChanges = cambios.length > 0 && cambios.every((c) => {
-      return (
-        c.type === 'modified' &&
-        c.changedFields &&
-        Boolean(c.changedFields.resultado) &&
-        !Boolean(c.changedFields.fecha) &&
-        !Boolean(c.changedFields.hora) &&
-        !Boolean(c.changedFields.pista)
-      );
+    const hasScheduleChange = cambios.some((c) => {
+      if (c.type === 'added' || c.type === 'removed') return true;
+      if (c.type !== 'modified' || !c.changedFields) return false;
+      return Boolean(c.changedFields.fecha) || Boolean(c.changedFields.hora);
     });
 
     // Siempre actualizamos la hoja con los nuevos partidos
@@ -454,8 +448,8 @@ async function main() {
       console.error("No se pudo escribir meta timestamp:", e);
     }
 
-    if (onlyResultChanges) {
-      console.log("Sólo cambios en resultados detectados; no se enviarán emails.");
+    if (!hasScheduleChange) {
+      console.log("No hay cambios en fecha u hora; se omite el envío de emails.");
     } else {
       const content = buildEmailContent({ cambios, cachedAt: new Date().toISOString() });
       try {
