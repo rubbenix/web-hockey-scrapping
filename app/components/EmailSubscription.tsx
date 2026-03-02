@@ -38,9 +38,10 @@ export function EmailSubscription({ onSuccess }: { onSuccess?: () => void }) {
         title: "No s'ha pogut guardar",
         description: msg,
       });
-    } finally {
-      setLoading(false);
     }
+    // Avoid using `finally` to keep React Compiler optimizations happy;
+    // set loading state after try/catch instead.
+    setLoading(false);
   }
 
   if (hidden) return null;

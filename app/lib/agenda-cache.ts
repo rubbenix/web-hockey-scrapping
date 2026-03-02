@@ -27,3 +27,7 @@ export async function getCachedPartidos() {
 export function clearAgendaCache() {
   cached = null;
 }
+
+export function getAgendaCacheStatus() {
+  return { hasCache: cached !== null, ts: cached?.ts };
+}

@@ -16,7 +16,7 @@ export function parseFechaHora(fecha: string, hora: string) {
   return new Date(y, m - 1, d, h, min);
 }
 
-export function isValidPartido(p: Partial<Partido>): p is Partido {
+function isValidPartido(p: Partial<Partido>): p is Partido {
   return Boolean(
     p.categoria &&
       p.fecha &&

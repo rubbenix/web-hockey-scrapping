@@ -4,11 +4,18 @@ const CLUB_ID = "253";
 const CATEGORIA = "BENJAMÍ OR COPA BCN 2";
 
 import { HeroNextMatch } from "./components/HeroNextMatch";
+// Forzar comportamiento dinámico: evitar prerender estático en Vercel
+export const dynamic = "force-dynamic";
 import { MatchCard } from "./components/MatchCard";
 import { Section } from "./components/Section";
 import { SubscriptionBell } from "./components/SubscriptionBell";
 import { parseFechaHora, type Partido } from "./lib/agenda";
 import { getCachedPartidos } from "./lib/agenda-cache";
+
+export const metadata = {
+  title: "Hockey JMJ - Agenda",
+  description: "Agenda i resultats del Benjamí A",
+};
 
 async function getPartidos(): Promise<{ partidos: Partido[]; cachedAt?: string }> {
   // Leer directamente desde el reader/caché en servidor para evitar la llamada HTTP interna
@@ -41,14 +48,16 @@ export default async function Home() {
           </span>
           <SubscriptionBell />
         </div>
-        <HeroNextMatch partido={proximo} />
+        <HeroNextMatch partido={proximo} clubId={CLUB_ID} categoriaFilter={CATEGORIA} />
 
         <Section title="Pròxims partits">
           <div className="space-y-4">
             {futuros.length === 0 ? (
               <div className="text-blue-400">No hi ha pròxims partits.</div>
             ) : (
-              futuros.map((p, i) => <MatchCard key={`${p.fecha}-${p.hora}-${i}`} partido={p} />)
+              futuros.map((p) => (
+                <MatchCard key={`${p.categoria}|${p.equipo_local}|${p.equipo_visitante}`} partido={p} />
+              ))
             )}
           </div>
         </Section>
@@ -58,7 +67,9 @@ export default async function Home() {
             {jugados.length === 0 ? (
               <div className="text-blue-200">No hi ha partits jugats.</div>
             ) : (
-              jugados.map((p, i) => <MatchCard key={`${p.fecha}-${p.hora}-${i}`} partido={p} />)
+              jugados.map((p) => (
+                <MatchCard key={`${p.categoria}|${p.equipo_local}|${p.equipo_visitante}`} partido={p} />
+              ))
             )}
           </div>
         </Section>
