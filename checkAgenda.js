@@ -432,32 +432,52 @@ async function main() {
 
   if (cambios.length > 0) {
     console.log("Cambios detectados 🚨");
+    // Detectar si los únicos cambios son en el resultado (no fecha/hora/pista/added/removed)
+    const onlyResultChanges = cambios.length > 0 && cambios.every((c) => {
+      return (
+        c.type === 'modified' &&
+        c.changedFields &&
+        Boolean(c.changedFields.resultado) &&
+        !Boolean(c.changedFields.fecha) &&
+        !Boolean(c.changedFields.hora) &&
+        !Boolean(c.changedFields.pista)
+      );
+    });
+
+    // Siempre actualizamos la hoja con los nuevos partidos
     await writeMatchesToSheet(nuevos);
-    const content = buildEmailContent({ cambios, cachedAt: new Date().toISOString() });
-    try {
-      const subs = await readSubscribersFromSheet();
-      if (Array.isArray(subs) && subs.length > 0) {
-        // Enviar individualmente a cada suscriptor
-        const res = await enviarEmailIndividuales(content, subs);
-        console.log(`Emails enviados: ${res.sent.length}, fallidos: ${res.failed.length}`);
-      } else {
-        console.log('No hay suscriptores en la hoja, se usará el EMAIL_USER/EMAIL_TO por defecto');
-        await enviarEmail(content);
-      }
-    } catch (e) {
-      console.error('Error al obtener suscriptores o enviar emails, intentando envío por defecto:', e);
-      try {
-        await enviarEmail(content);
-      } catch (err) {
-        console.error('Error enviando email por defecto:', err);
-      }
-    }
+
+    // Actualizamos meta timestamp antes o después de enviar (intento de escritura)
     try {
       await writeMetaTimestamp(new Date().toISOString());
     } catch (e) {
       console.error("No se pudo escribir meta timestamp:", e);
     }
-    console.log("Email enviado.");
+
+    if (onlyResultChanges) {
+      console.log("Sólo cambios en resultados detectados; no se enviarán emails.");
+    } else {
+      const content = buildEmailContent({ cambios, cachedAt: new Date().toISOString() });
+      try {
+        const subs = await readSubscribersFromSheet();
+        if (Array.isArray(subs) && subs.length > 0) {
+          // Enviar individualmente a cada suscriptor
+          const res = await enviarEmailIndividuales(content, subs);
+          console.log(`Emails enviados: ${res.sent.length}, fallidos: ${res.failed.length}`);
+        } else {
+          console.log('No hay suscriptores en la hoja, se usará el EMAIL_USER/EMAIL_TO por defecto');
+          await enviarEmail(content);
+        }
+      } catch (e) {
+        console.error('Error al obtener suscriptores o enviar emails, intentando envío por defecto:', e);
+        try {
+          await enviarEmail(content);
+        } catch (err) {
+          console.error('Error enviando email por defecto:', err);
+        }
+      }
+      console.log("Email enviado.");
+    }
   } else {
     if (needsSheetUpgrade) {
       await writeMatchesToSheet(nuevos);
